@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>🔍 Teste de IP - DF_STRUCTS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .box {
+      background-color: #20202a;
+      border-radius: 14px;
+      padding: 30px;
+      max-width: 520px;
+      margin: auto;
+      box-shadow: 0 0 15px rgba(125, 96, 255, 0.3);
+      border: 1px solid #333;
+    }
+    h1 {
+      color: #b09cff;
+      font-size: 1.6rem;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #aaa;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    .ip-display {
+      font-size: 2.1rem;
+      font-weight: bold;
+      color: #00d4ff;
+      background: #1a1a2e;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px auto;
+      max-width: 400px;
+      word-break: break-all;
+    }
+    .btn {
+      background-color: #7D60FF;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background-color: #a084fa;
+    }
+    .info {
+      font-size: 0.9rem;
+      color: #888;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>🔍 Teste de IP Público</h1>
+    <p>Este teste mostra o IP público que o servidor vê quando você acessa.</p>
+
+    <div class="ip-display" id="ipDisplay">Carregando...</div>
+
+    <button class="btn" onclick="testarIP()">🔄 Atualizar IP</button>
+
+    <div class="info">
+      <p><strong>Dica:</strong> Acesse esta página pelo celular com <strong>dados móveis</strong> para ver seu IP real da operadora.</p>
+    </div>
+  </div>
+
+  <script>
+    async function mostrarIP() {
+      try {
+        const response = await fetch('/meu-ip');
+        const data = await response.json();
+        const ip = data.dados?.ipPublicoIPv4Real || 'Não disponível';
+        document.getElementById('ipDisplay').textContent = ip;
+      } catch (err) {
+        document.getElementById('ipDisplay').textContent = 'Erro';
+        console.error('Erro ao obter IP:', err);
+      }
+    }
+
+    function testarIP() {
+      mostrarIP();
+    }
+
+    // Carrega automaticamente ao abrir
+    mostrarIP();
+  </script>
+</body>
+</html>

